@@ -23,8 +23,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String bearerToken = request.getHeader("Authorization");
 
+        System.out.print("AUTORIZANDO: " + bearerToken + "\n");
+
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            System.out.print("ENTRO " + bearerToken + "\n");
             String token = bearerToken.replace("Bearer ", "");
+            System.out.print("REEMPLAZO " + token + "\n");
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = TokenUtils.getAuthenticationToken(token);
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }

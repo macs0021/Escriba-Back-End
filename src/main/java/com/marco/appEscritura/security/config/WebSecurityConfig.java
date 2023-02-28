@@ -39,8 +39,6 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/user")
                 .permitAll()
-                .requestMatchers("/documents/**")
-                .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
