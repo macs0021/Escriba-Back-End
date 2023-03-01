@@ -11,7 +11,6 @@ import java.util.List;
 
 @Data
 @Entity
-@AllArgsConstructor
 @Table(name="document")
 public class Document  implements Serializable {
     @Id
@@ -21,7 +20,7 @@ public class Document  implements Serializable {
     @Column(columnDefinition="TEXT", length = 10000)
     String privateText;
 
-    String name;
+    String tittle;
 
     String synopsis;
 
@@ -51,6 +50,6 @@ public class Document  implements Serializable {
     }
 
     public DocumentDTO toDto(){
-     return new DocumentDTO(id,name,cover,synopsis,privateText);
+     return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis);
     }
 }

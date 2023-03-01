@@ -17,7 +17,7 @@ public class DocumentController {
 
     @Autowired
     private DocumentService documentService;
-   @GetMapping("")
+   @GetMapping
     public Iterable<DocumentDTO> getAllDocuments(){
        Iterable<Document> documents = documentService.getAllDocuments();
        Collection<Document> documentCollection = new ArrayList<>();
@@ -37,12 +37,23 @@ public class DocumentController {
 
         System.out.println("POSTING " + documentDto.getId() + " " + documentDto.getPrivateText());
 
-        return documentService.updateDocument(documentDto.toDocument());
+        return documentService.updateDocument(documentDto);
     }
     @PostMapping
     public Long createDocument(@RequestBody DocumentDTO documentDto){
 
-        return documentService.createDocument(documentDto.toDocument());
+        return documentService.createDocument(documentDto);
     }
+
+    @GetMapping("/user/{username}")
+    public Iterable<DocumentDTO> getDocumentsCreatedBy(@PathVariable String username){
+        Iterable<Document> documents = documentService.getDocumentsCreatedBy(username);
+        Collection<Document> documentCollection = new ArrayList<>();
+        documents.forEach(documentCollection::add);
+        return documentCollection.stream()
+                .map(document -> document.toDto())
+                .collect(Collectors.toList());
+    }
+
 
 }
