@@ -47,13 +47,17 @@ public class DocumentService {
         return documents.get().stream().collect(Collectors.toList());
     }
 
+    public void deleteDocument(long id){
+        documentRepository.deleteById(id);
+    }
+
 
     private Document DtoToDocument(DocumentDTO documentDto){
 
             System.out.println(documentDto);
             Optional<User> user = userRepository.findOneByUsername(documentDto.getCreatorUsername());
             Document document = new Document();
-
+            document.setId(documentDto.getId());
             document.setSynopsis(documentDto.getSynopsis());
             document.setTittle(documentDto.getTittle());
             document.setPrivateText(documentDto.getPrivateText());

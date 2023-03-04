@@ -55,5 +55,11 @@ public class DocumentController {
                 .collect(Collectors.toList());
     }
 
+    @DeleteMapping("/{documentId}")
+    public void deleteDocument(@PathVariable long documentId){
+       System.out.println("BORRANDO");
+       documentService.deleteDocument(documentId);
+    }
+
 
 }

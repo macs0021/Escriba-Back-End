@@ -22,6 +22,7 @@ public class Document  implements Serializable {
 
     String tittle;
 
+    @Column(length = 10000  )
     String synopsis;
 
     @Column(length = 10000000)
