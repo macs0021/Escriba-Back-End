@@ -51,6 +51,6 @@ public class Document  implements Serializable {
     }
 
     public DocumentDTO toDto(){
-     return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis);
+     return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis,genres);
     }
 }

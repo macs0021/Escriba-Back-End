@@ -41,7 +41,7 @@ public class DocumentController {
     }
     @PostMapping
     public Long createDocument(@RequestBody DocumentDTO documentDto){
-
+        System.out.println("POSTING " + documentDto);
         return documentService.createDocument(documentDto);
     }
 

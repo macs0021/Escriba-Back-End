@@ -1,8 +1,6 @@
-package com.marco.appEscritura.security;
-
+package com.marco.appEscritura.security.details;
 import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.repository.UserRepository;
-import com.marco.appEscritura.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,9 +12,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findOneByUsername(username).orElseThrow(()->new UsernameNotFoundException("The user does not exist"));
-        return new UserDetailsImpl(user);
+        User user = userRepository.findOneByUsername(username).get();
+        return UserDetailsImpl.build(user);
     }
 }

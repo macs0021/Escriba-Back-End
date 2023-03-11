@@ -43,6 +43,12 @@ public class User {
         postedComments = new ArrayList<>();
     }
 
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
     UserDTO toDto(){
         return new UserDTO(this.id, this.username);
     }

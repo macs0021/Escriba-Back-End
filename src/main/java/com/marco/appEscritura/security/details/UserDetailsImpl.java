@@ -1,17 +1,25 @@
-package com.marco.appEscritura.security;
+package com.marco.appEscritura.security.details;
 
 import com.marco.appEscritura.entity.User;
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
 
-@AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
+    private String username;
+    private String password;
 
-    private final User user;
+    public UserDetailsImpl(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public static UserDetailsImpl build(User user){
+        return new UserDetailsImpl(user.getUsername(), user.getPassword());
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
@@ -19,12 +27,12 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return username;
     }
 
     @Override
@@ -46,7 +54,5 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    public String getEmail(){
-        return user.getEmail();
-    }
+
 }

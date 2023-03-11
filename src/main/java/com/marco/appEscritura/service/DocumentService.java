@@ -35,7 +35,6 @@ public class DocumentService {
         return documents;
     }
     public Long createDocument(DocumentDTO documentDto){
-
         return documentRepository.save(DtoToDocument(documentDto)).getId();
     }
     public Long updateDocument(DocumentDTO documentDto){
@@ -63,6 +62,7 @@ public class DocumentService {
             document.setPrivateText(documentDto.getPrivateText());
             document.setCover(documentDto.getCover());
             document.setCreator(user.get());
+            document.setGenres(documentDto.getGenres());
 
             return document;
 
