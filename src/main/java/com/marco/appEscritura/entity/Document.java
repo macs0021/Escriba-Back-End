@@ -2,12 +2,13 @@ package com.marco.appEscritura.entity;
 
 import com.marco.appEscritura.dto.DocumentDTO;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -31,8 +32,8 @@ public class Document  implements Serializable {
 
     List<String> tags;
 
-    @ManyToMany(mappedBy = "likedDocuments")
-    List<User> likedBy;
+    @ManyToMany(mappedBy = "savedDocuments")
+    List<User> savedBy;
 
     @OneToMany(mappedBy = "commentedDocument")
     List<Comment> comments;
@@ -44,13 +45,14 @@ public class Document  implements Serializable {
         publicText = " ";
         cover = " ";
         synopsis = " ";
-        likedBy = new ArrayList<>();
+        savedBy = new ArrayList<>();
         comments = new ArrayList<>();
         genres = new ArrayList<>();
         tags = new ArrayList<>();
     }
 
     public DocumentDTO toDto(){
-     return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis,genres);
+        List<UUID> savedUsersUUID = savedBy.stream().map(user -> user.id).collect(Collectors.toList());
+        return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis,genres,savedUsersUUID);
     }
 }

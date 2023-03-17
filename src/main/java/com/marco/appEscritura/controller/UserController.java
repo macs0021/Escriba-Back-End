@@ -16,10 +16,6 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping
-    public void registerUser(@RequestBody User user){
-        userService.save(user);
-    }
     @GetMapping
     public List<User> getUsers(){
         return userService.getAllUsers();

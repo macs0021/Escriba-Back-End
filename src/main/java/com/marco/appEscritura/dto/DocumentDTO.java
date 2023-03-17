@@ -6,6 +6,7 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class DocumentDTO {
@@ -19,6 +20,8 @@ public class DocumentDTO {
     String synopsis;
     List<String> genres;
 
+    List<UUID> savedBy;
+
     public DocumentDTO() {
         this.privateText = "";
         genres = new ArrayList<>();
@@ -28,7 +31,7 @@ public class DocumentDTO {
         this.privateText = privateText;
     }
 
-    public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<String> genres) {
+    public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<String> genres, List<UUID> savedBy) {
         System.out.println(genres);
         this.id = id;
         this.tittle = tittle;
@@ -37,5 +40,6 @@ public class DocumentDTO {
         this.creatorUsername = creatorUsername;
         this.synopsis = synopsis;
         this.genres = genres;
+        this.savedBy = savedBy;
     }
 }

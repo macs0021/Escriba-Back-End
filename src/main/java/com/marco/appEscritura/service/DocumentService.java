@@ -9,9 +9,6 @@ import com.marco.appEscritura.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,48 +20,79 @@ public class DocumentService {
     @Autowired
     UserRepository userRepository;
 
-    public Document getDocument(Long id){
+    public Document getDocument(Long id) {
         Optional<Document> documentOptional = documentRepository.findById(id);
-        if(!documentOptional.isPresent()){
-           throw new NotExistingDocument("The document " + documentOptional.get().getTittle() + " does not exist");
+        if (!documentOptional.isPresent()) {
+            throw new NotExistingDocument("The document " + documentOptional.get().getTittle() + " does not exist");
         }
         return documentOptional.get();
     }
-    public Iterable<Document> getAllDocuments(){
+
+    public Iterable<Document> getAllDocuments() {
         Iterable<Document> documents = documentRepository.findAll();
         return documents;
     }
-    public Long createDocument(DocumentDTO documentDto){
-        return documentRepository.save(DtoToDocument(documentDto)).getId();
+
+    public Long createDocument(DocumentDTO documentDto) {
+
+        Document document = DtoToDocument(documentDto);
+        User user = userRepository.findOneByUsername(documentDto.getCreatorUsername()).get();
+        user.getCreated().add(document);
+        Long id = documentRepository.save(document).getId();
+        userRepository.save(user);
+        return id;
+
     }
-    public Long updateDocument(DocumentDTO documentDto){
+
+    public void userSavesDocument(String username, Long documentId) {
+        User user = userRepository.findOneByUsername(username).get();
+        Document document = documentRepository.findById(documentId).get();
+
+        if (!user.getSavedDocuments().contains(document))
+            user.getSavedDocuments().add(document);
+
+        document.getSavedBy().add(user);
+
+        if (!user.getSavedDocuments().contains(document)) {
+            user.getSavedDocuments().add(document);
+            userRepository.save(user);
+        }
+        documentRepository.save(document);
+    }
+
+
+    public Long updateDocument(DocumentDTO documentDto) {
         return documentRepository.save(DtoToDocument(documentDto)).getId();
     }
 
-    public Iterable<Document> getDocumentsCreatedBy(String username){
-        Optional<List<Document>> documents = documentRepository.findByCreatorUsername(username);
-        return documents.get().stream().collect(Collectors.toList());
+    public Iterable<Document> getDocumentsCreatedBy(String username) {
+        Optional<User> user = userRepository.findOneByUsername(username);
+        return user.get().getCreated().stream().collect(Collectors.toList());
     }
 
-    public void deleteDocument(long id){
+    public Iterable<Document> getDocumentSavedBy(String username) {
+        Optional<User> user = userRepository.findOneByUsername(username);
+        return user.get().getSavedDocuments().stream().collect(Collectors.toList());
+    }
+
+    public void deleteDocument(long id) {
         documentRepository.deleteById(id);
     }
 
 
-    private Document DtoToDocument(DocumentDTO documentDto){
+    private Document DtoToDocument(DocumentDTO documentDto) {
 
-            System.out.println(documentDto);
-            Optional<User> user = userRepository.findOneByUsername(documentDto.getCreatorUsername());
-            Document document = new Document();
-            document.setId(documentDto.getId());
-            document.setSynopsis(documentDto.getSynopsis());
-            document.setTittle(documentDto.getTittle());
-            document.setPrivateText(documentDto.getPrivateText());
-            document.setCover(documentDto.getCover());
-            document.setCreator(user.get());
-            document.setGenres(documentDto.getGenres());
-
-            return document;
+        System.out.println(documentDto);
+        Optional<User> user = userRepository.findOneByUsername(documentDto.getCreatorUsername());
+        Document document = new Document();
+        document.setId(documentDto.getId());
+        document.setSynopsis(documentDto.getSynopsis());
+        document.setTittle(documentDto.getTittle());
+        document.setPrivateText(documentDto.getPrivateText());
+        document.setCover(documentDto.getCover());
+        document.setCreator(user.get());
+        document.setGenres(documentDto.getGenres());
+        return document;
 
     }
 

@@ -30,8 +30,11 @@ public class User {
 
     String email;
 
+    @OneToMany(mappedBy="creator")
+    List<Document> created;
+
     @ManyToMany
-    List<Document> likedDocuments;
+    List<Document> savedDocuments;
 
     @OneToMany(mappedBy = "postedBy")
     List<Comment> postedComments;
@@ -39,7 +42,7 @@ public class User {
     public User() {
         username = "";
         password = "";
-        likedDocuments = new ArrayList<>();
+        savedDocuments = new ArrayList<>();
         postedComments = new ArrayList<>();
     }
 
@@ -50,6 +53,6 @@ public class User {
     }
 
     UserDTO toDto(){
-        return new UserDTO(this.id, this.username);
+        return new UserDTO();
     }
 }
