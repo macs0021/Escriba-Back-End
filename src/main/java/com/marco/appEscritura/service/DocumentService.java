@@ -48,13 +48,23 @@ public class DocumentService {
         User user = userRepository.findOneByUsername(username).get();
         Document document = documentRepository.findById(documentId).get();
 
-        if (!user.getSavedDocuments().contains(document))
-            user.getSavedDocuments().add(document);
-
         document.getSavedBy().add(user);
 
         if (!user.getSavedDocuments().contains(document)) {
             user.getSavedDocuments().add(document);
+            userRepository.save(user);
+        }
+        documentRepository.save(document);
+    }
+
+    public void userUnsavesDocument(String username, Long documentId) {
+        User user = userRepository.findOneByUsername(username).get();
+        Document document = documentRepository.findById(documentId).get();
+
+        document.getSavedBy().remove(user);
+
+        if (user.getSavedDocuments().contains(document)) {
+            user.getSavedDocuments().remove(document);
             userRepository.save(user);
         }
         documentRepository.save(document);

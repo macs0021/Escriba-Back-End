@@ -52,7 +52,7 @@ public class Document  implements Serializable {
     }
 
     public DocumentDTO toDto(){
-        List<UUID> savedUsersUUID = savedBy.stream().map(user -> user.id).collect(Collectors.toList());
+        List<String> savedUsersUUID = savedBy.stream().map(user -> user.username).collect(Collectors.toList());
         return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis,genres,savedUsersUUID);
     }
 }

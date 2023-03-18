@@ -67,6 +67,12 @@ public class DocumentController {
         documentService.userSavesDocument(username, savedDocument);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+    @DeleteMapping("/saved/{username}")
+    public ResponseEntity<Void> UserUnsavesDocument(@PathVariable String username, @RequestParam Long savedDocument) {
+        System.out.println(username + " Saving document: " + savedDocument);
+        documentService.userUnsavesDocument(username, savedDocument);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     @GetMapping("/saved/{username}")
     public Iterable<DocumentDTO> getDocumentsSavedBy(@PathVariable String username) {

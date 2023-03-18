@@ -20,7 +20,7 @@ public class DocumentDTO {
     String synopsis;
     List<String> genres;
 
-    List<UUID> savedBy;
+    List<String> savedBy;
 
     public DocumentDTO() {
         this.privateText = "";
@@ -31,7 +31,7 @@ public class DocumentDTO {
         this.privateText = privateText;
     }
 
-    public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<String> genres, List<UUID> savedBy) {
+    public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<String> genres, List<String> savedBy) {
         System.out.println(genres);
         this.id = id;
         this.tittle = tittle;
