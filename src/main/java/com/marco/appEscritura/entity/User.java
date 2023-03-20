@@ -39,6 +39,9 @@ public class User {
     @OneToMany(mappedBy = "postedBy")
     List<Comment> postedComments;
 
+    @OneToMany(mappedBy = "reader")
+    List<Reading> reading;
+
     public User() {
         username = "";
         password = "";

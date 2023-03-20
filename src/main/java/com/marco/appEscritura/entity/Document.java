@@ -1,6 +1,7 @@
 package com.marco.appEscritura.entity;
 
 import com.marco.appEscritura.dto.DocumentDTO;
+import com.marco.appEscritura.dto.ReadingDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,18 +13,18 @@ import java.util.stream.Collectors;
 
 @Data
 @Entity
-@Table(name="document")
-public class Document  implements Serializable {
+@Table(name = "document")
+public class Document implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     String publicText;
-    @Column(columnDefinition="TEXT", length = 10000)
+    @Column(columnDefinition = "TEXT", length = 10000)
     String privateText;
 
     String tittle;
 
-    @Column(length = 10000  )
+    @Column(length = 10000)
     String synopsis;
 
     @Column(length = 10000000)
@@ -40,6 +41,9 @@ public class Document  implements Serializable {
     @ManyToOne
     User creator;
 
+    @OneToMany(mappedBy = "beingRead")
+    List<Reading> beingRead;
+
     public Document() {
         privateText = " ";
         publicText = " ";
@@ -51,8 +55,9 @@ public class Document  implements Serializable {
         tags = new ArrayList<>();
     }
 
-    public DocumentDTO toDto(){
+    public DocumentDTO toDto() {
         List<String> savedUsersUUID = savedBy.stream().map(user -> user.username).collect(Collectors.toList());
-        return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis,genres,savedUsersUUID);
+        List<ReadingDTO> readingsDto = beingRead.stream().map(reading -> reading.toDto()).collect(Collectors.toList());
+        return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis, genres, savedUsersUUID, readingsDto);
     }
 }

@@ -2,6 +2,7 @@ package com.marco.appEscritura.service;
 
 import com.marco.appEscritura.dto.DocumentDTO;
 import com.marco.appEscritura.entity.Document;
+import com.marco.appEscritura.entity.Reading;
 import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.exceptions.NotExistingDocument;
 import com.marco.appEscritura.repository.DocumentRepository;
@@ -9,6 +10,7 @@ import com.marco.appEscritura.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,9 @@ public class DocumentService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ReadingService readingService;
 
     public Document getDocument(Long id) {
         Optional<Document> documentOptional = documentRepository.findById(id);
@@ -102,6 +107,10 @@ public class DocumentService {
         document.setCover(documentDto.getCover());
         document.setCreator(user.get());
         document.setGenres(documentDto.getGenres());
+        List<Reading> readingList = documentDto.getReadings().stream()
+                .map(readingDTO -> readingService.DtoToReading(readingDTO))
+                .collect(Collectors.toList());
+        document.setBeingRead(readingList);
         return document;
 
     }
