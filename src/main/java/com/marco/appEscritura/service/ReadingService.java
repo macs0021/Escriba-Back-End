@@ -52,12 +52,19 @@ public class ReadingService {
         Optional<Reading> reading = readingRepository.findById(readingID);
 
         if (!reading.isPresent()) {
+            return null;
         }
         return reading.get();
 
     }
 
+    public void modifyReading(ReadingDTO readingDTO){
+        System.out.println("Modifying reading with scroll: " + readingDTO.getReadingSpot() + ";" + "Username: " + readingDTO.getUsername() + " document: " + readingDTO.getDocument());
+        readingRepository.save(DtoToReading(readingDTO));
+    }
+
     public Reading DtoToReading(ReadingDTO readingDTO) {
+        System.out.println("Username: " + readingDTO.getUsername() + " document: " + readingDTO.getDocument());
         User user = userRepository.findOneByUsername(readingDTO.getUsername()).get();
         Document document = documentRepository.findById(readingDTO.getDocument()).get();
         return new Reading(user, document, readingDTO.getReadingSpot());

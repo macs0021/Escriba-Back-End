@@ -29,9 +29,20 @@ public class ReadingController {
     }
 
     @GetMapping("/get/{documentID}/{username}")
-    public ResponseEntity<Reading> getReading(@PathVariable Long documentID, @PathVariable String username) {
+    public ResponseEntity<ReadingDTO> getReading(@PathVariable Long documentID, @PathVariable String username) {
+        System.out.println("PEDIDO " +documentID + " " + username);
         Reading reading = readingService.getReading(username, documentID);
-        return ResponseEntity.status(HttpStatus.OK).body(reading);
+        if (reading != null)
+            return ResponseEntity.status(HttpStatus.OK).body(reading.toDto());
 
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> modifyReading(@RequestBody ReadingDTO readingDto) {
+        System.out.println("MODIFICANDO LECTURA");
+        readingService.modifyReading(readingDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
