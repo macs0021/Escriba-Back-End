@@ -28,8 +28,8 @@ public class ReadingController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/get/{documentID}/{username}")
-    public ResponseEntity<ReadingDTO> getReading(@PathVariable Long documentID, @PathVariable String username) {
+    @GetMapping("/get/{username}/{documentID}")
+    public ResponseEntity<ReadingDTO> getReading(@PathVariable String username, @PathVariable Long documentID) {
         System.out.println("PEDIDO " +documentID + " " + username);
         Reading reading = readingService.getReading(username, documentID);
         if (reading != null)

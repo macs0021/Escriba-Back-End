@@ -85,6 +85,17 @@ public class DocumentController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/read/{username}")
+    public Iterable<DocumentDTO> getDocumentsBeingReadBy(@PathVariable String username) {
+        System.out.println("Getting reading documents of " + username);
+        Iterable<Document> documents = documentService.getDocumentsBeingReadBy(username);
+        Collection<Document> documentCollection = new ArrayList<>();
+        documents.forEach(documentCollection::add);
+        return documentCollection.stream()
+                .map(document -> document.toDto())
+                .collect(Collectors.toList());
+    }
+
     @DeleteMapping("/{documentId}")
     public void deleteDocument(@PathVariable long documentId) {
         System.out.println("BORRANDO");

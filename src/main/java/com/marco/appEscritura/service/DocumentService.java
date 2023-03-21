@@ -3,6 +3,7 @@ package com.marco.appEscritura.service;
 import com.marco.appEscritura.dto.DocumentDTO;
 import com.marco.appEscritura.entity.Document;
 import com.marco.appEscritura.entity.Reading;
+import com.marco.appEscritura.entity.ReadingID;
 import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.exceptions.NotExistingDocument;
 import com.marco.appEscritura.repository.DocumentRepository;
@@ -92,6 +93,18 @@ public class DocumentService {
 
     public void deleteDocument(long id) {
         documentRepository.deleteById(id);
+    }
+
+    public List<Document> getDocumentsBeingReadBy(String username){
+        Optional<User> user = userRepository.findOneByUsername(username);
+
+        if(!user.isPresent()){
+            //Excepcion
+        }
+
+        return user.get().getReading().stream()
+                .map(Reading::getBeingRead)
+                .collect(Collectors.toList());
     }
 
 
