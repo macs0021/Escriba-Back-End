@@ -10,6 +10,7 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -19,34 +20,40 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     protected UUID id;
-
     @NotNull
     @NotBlank
-    @Column(unique=true)
+    @Column(unique = true)
     String username;
-
     @NotBlank
     String password;
-
     String email;
+    String image;
+    String description;
 
-    @OneToMany(mappedBy="creator")
+    @OneToMany(mappedBy = "creator")
     List<Document> created;
-
     @ManyToMany
     List<Document> savedDocuments;
-
     @OneToMany(mappedBy = "postedBy")
     List<Comment> postedComments;
-
     @OneToMany(mappedBy = "reader")
     List<Reading> reading;
+
+    @ManyToMany
+    List<User> following;
+
+    @ManyToMany(mappedBy = "following")
+    List<User> followers;
 
     public User() {
         username = "";
         password = "";
+        image = "";
+        description = "";
         savedDocuments = new ArrayList<>();
         postedComments = new ArrayList<>();
+        followers = new ArrayList<>();
+        following = new ArrayList<>();
     }
 
     public User(String username, String password, String email) {
@@ -55,7 +62,17 @@ public class User {
         this.email = email;
     }
 
-    UserDTO toDto(){
-        return new UserDTO();
+    public UserDTO toDto() {
+        UserDTO user = new UserDTO();
+        user.setImage(image);
+        user.setDescription(description);
+        user.setFollowers(followers.stream()
+                .map(User::getUsername)
+                .collect(Collectors.toList()));
+        user.setFollowing(following.stream()
+                .map(User::getUsername)
+                .collect(Collectors.toList()));
+        user.setEmail(email);
+        return user;
     }
 }

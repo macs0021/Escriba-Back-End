@@ -1,5 +1,6 @@
 package com.marco.appEscritura.service;
 
+import com.marco.appEscritura.dto.UserDTO;
 import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -21,21 +22,56 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public Optional<User> getById(UUID id){
+    public Optional<User> getById(UUID id) {
         return userRepository.findById(id);
     }
-    public Optional<User> getByUsername(String username){ return userRepository.findOneByUsername(username);}
 
-    public boolean existsByUsername(String username){ return userRepository.existsByUsername(username);}
+    public User getByUsername(String username) {
 
-    public boolean existsByEmail(String email){return userRepository.existsByEmail(email);}
+        Optional<User> user = userRepository.findOneByUsername(username);
+        if (!user.isPresent()) {
+            //excepcion
+        }
 
-    public User save(User user){
+        return user.get();
+    }
+
+    public void updateUser(String username, UserDTO userDTO) {
+        Optional<User> userOptional = userRepository.findOneByUsername(username);
+
+        if (!userOptional.isPresent()) {
+            //excepcion
+        }
+
+        User user = userOptional.get();
+
+        if (userDTO.getName() != null)
+            user.setUsername(userDTO.getName());
+        if (userDTO.getImage() != null)
+            user.setImage(userDTO.getImage());
+        if (userDTO.getDescription() != null)
+            user.setDescription(userDTO.getDescription());
+        if(userDTO.getEmail()!=null)
+            user.setEmail(userDTO.getEmail());
+
+        userRepository.save(user);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public User save(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-    public List<User> getAllUsers(){
-        return (List)userRepository.findAll();
+
+    public List<User> getAllUsers() {
+        return (List) userRepository.findAll();
     }
 
 }
