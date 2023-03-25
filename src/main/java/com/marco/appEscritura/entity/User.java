@@ -27,6 +27,8 @@ public class User {
     @NotBlank
     String password;
     String email;
+    @Lob
+    @Column(columnDefinition = "TEXT")
     String image;
     String description;
 
@@ -54,16 +56,24 @@ public class User {
         postedComments = new ArrayList<>();
         followers = new ArrayList<>();
         following = new ArrayList<>();
+        email = "";
     }
 
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.image = "";
+        this.description = "";
+        this.savedDocuments = new ArrayList<>();
+        this.postedComments = new ArrayList<>();
+        this.followers = new ArrayList<>();
+        this.following = new ArrayList<>();
     }
 
     public UserDTO toDto() {
         UserDTO user = new UserDTO();
+        user.setName(username);
         user.setImage(image);
         user.setDescription(description);
         user.setFollowers(followers.stream()

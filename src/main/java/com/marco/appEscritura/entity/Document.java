@@ -24,10 +24,12 @@ public class Document implements Serializable {
 
     String tittle;
 
-    @Column(length = 10000)
+    @Lob
+    @Column(columnDefinition = "TEXT")
     String synopsis;
 
-    @Column(length = 10000000)
+    @Lob
+    @Column(columnDefinition = "TEXT")
     String cover;
     List<String> genres;
 

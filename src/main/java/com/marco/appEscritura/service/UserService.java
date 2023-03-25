@@ -51,7 +51,7 @@ public class UserService {
             user.setImage(userDTO.getImage());
         if (userDTO.getDescription() != null)
             user.setDescription(userDTO.getDescription());
-        if(userDTO.getEmail()!=null)
+        if (userDTO.getEmail() != null)
             user.setEmail(userDTO.getEmail());
 
         userRepository.save(user);
@@ -72,6 +72,31 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return (List) userRepository.findAll();
+    }
+
+    public void updateFollowers(String username, String follower) {
+        Optional<User> followingUserOptional = userRepository.findOneByUsername(username);
+        Optional<User> followerUserOptional = userRepository.findOneByUsername(follower);
+
+        if (!followingUserOptional.isPresent() || !followerUserOptional.isPresent()) {
+            //excepcion
+        }
+
+        User followingUser = followingUserOptional.get();
+        User followerUser = followerUserOptional.get();
+
+        if (!followingUser.getFollowers().contains(followerUser)) {
+            followingUser.getFollowers().add(followerUser);
+            followerUser.getFollowing().add(followingUser);
+            System.out.println("siguiendo...");
+        } else {
+            followingUser.getFollowers().remove(followerUser);
+            followerUser.getFollowing().remove(followingUser);
+            System.out.println("dejando de seguir...");
+        }
+
+        userRepository.save(followerUser);
+        userRepository.save(followingUser);
     }
 
 }

@@ -23,7 +23,10 @@ public class UserDTO {
     List<String> followers;
 
     public UserDTO() {
-
+        this.name = "";
+        this.image = "";
+        this.email = "";
+        this.description = "";
     }
 
 }

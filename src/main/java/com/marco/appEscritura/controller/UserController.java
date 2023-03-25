@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     @Autowired
     UserService userService;
@@ -32,6 +33,11 @@ public class UserController {
     @PutMapping("/{username}")
     public ResponseEntity<Void> updateUser(@PathVariable String username, @RequestBody UserDTO userDTO){
         userService.updateUser(username,userDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+    @PatchMapping("/{username}/followers/{follower}")
+    public ResponseEntity<Void> updateFollowers(@PathVariable String username, @PathVariable String follower){
+        userService.updateFollowers(username,follower);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
