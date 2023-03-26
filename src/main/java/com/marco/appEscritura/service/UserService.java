@@ -99,4 +99,21 @@ public class UserService {
         userRepository.save(followingUser);
     }
 
+    public List<User> getFollowersOf(String username){
+        Optional<User> userOptional = userRepository.findOneByUsername(username);
+        if(!userOptional.isPresent()){
+            //Excepcion
+        }
+        return userOptional.get().getFollowers();
+
+
+    }
+    public List<User> getFollowingOf(String username){
+        Optional<User> userOptional = userRepository.findOneByUsername(username);
+        if(!userOptional.isPresent()){
+            //Excepcion
+        }
+        return userOptional.get().getFollowing();
+    }
+
 }

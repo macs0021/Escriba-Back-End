@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -39,6 +40,19 @@ public class UserController {
     public ResponseEntity<Void> updateFollowers(@PathVariable String username, @PathVariable String follower){
         userService.updateFollowers(username,follower);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/{username}/following")
+    public ResponseEntity<List<UserDTO>> getFollowing(@PathVariable String username){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getFollowingOf(username).stream()
+                .map(user -> user.toDto())  
+                .collect(Collectors.toList()));
+    }
+    @GetMapping("/{username}/followers")
+    public ResponseEntity<List<UserDTO>> getFollowers(@PathVariable String username){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getFollowersOf(username).stream()
+                .map(user -> user.toDto())
+                .collect(Collectors.toList()));
     }
 
 }
