@@ -28,6 +28,7 @@ public class UserController {
 
     @GetMapping("/{username}")
     public UserDTO getUserByUsername(@PathVariable String username){
+        System.out.println("enviando: " + userService.getByUsername(username).toDto().getImage());
         return userService.getByUsername(username).toDto();
     }
 

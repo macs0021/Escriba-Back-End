@@ -48,6 +48,8 @@ public class AuthController {
 
         User user = new User(newUser.getUsername(),
                         newUser.getPassword(),newUser.getEmail());
+        System.out.println("Imagen de perfil por defecto: " + newUser.getProfileImage() );
+        user.setImage(newUser.getProfileImage());
 
         userService.save(user);
         return new ResponseEntity(HttpStatus.CREATED);
