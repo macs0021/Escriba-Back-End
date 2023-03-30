@@ -36,8 +36,8 @@ public class UserService {
         return user.get();
     }
 
-    public void updateUser(String username, UserDTO userDTO) {
-        Optional<User> userOptional = userRepository.findOneByUsername(username);
+    public void updateUser(UUID id, UserDTO userDTO) {
+        Optional<User> userOptional = userRepository.findById(id);
 
         if (!userOptional.isPresent()) {
             //excepcion

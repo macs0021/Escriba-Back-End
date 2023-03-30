@@ -73,6 +73,7 @@ public class User {
 
     public UserDTO toDto() {
         UserDTO user = new UserDTO();
+        user.setId(id);
         user.setName(username);
         user.setImage(image);
         user.setDescription(description);

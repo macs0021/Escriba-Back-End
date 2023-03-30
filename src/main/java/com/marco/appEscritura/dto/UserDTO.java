@@ -15,6 +15,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class UserDTO {
+    UUID id;
     String name;
     String image;
     String email;

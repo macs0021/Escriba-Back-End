@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,9 +33,9 @@ public class UserController {
         return userService.getByUsername(username).toDto();
     }
 
-    @PutMapping("/{username}")
-    public ResponseEntity<Void> updateUser(@PathVariable String username, @RequestBody UserDTO userDTO){
-        userService.updateUser(username,userDTO);
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateUser(@PathVariable UUID id, @RequestBody UserDTO userDTO){
+        userService.updateUser(id,userDTO);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     @PatchMapping("/{username}/followers/{follower}")
