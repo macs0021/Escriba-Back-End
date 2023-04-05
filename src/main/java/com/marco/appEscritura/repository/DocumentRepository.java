@@ -14,4 +14,6 @@ import java.util.Optional;
 public interface DocumentRepository extends CrudRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE d.creator.username = ?1")
     Optional<List<Document>> findByCreatorUsername(String username);
+
+
 }

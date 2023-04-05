@@ -77,8 +77,8 @@ public class DocumentService {
     }
 
 
-    public Long updateDocument(DocumentDTO documentDto) {
-        return documentRepository.save(DtoToDocument(documentDto)).getId();
+    public Document updateDocument(DocumentDTO documentDto) {
+        return documentRepository.save(DtoToDocument(documentDto));
     }
 
     public Iterable<Document> getDocumentsCreatedBy(String username) {

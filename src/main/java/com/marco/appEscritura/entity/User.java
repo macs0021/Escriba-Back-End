@@ -30,6 +30,8 @@ public class User {
     @Lob
     @Column(columnDefinition = "TEXT")
     String image;
+    @Lob
+    @Column(columnDefinition = "TEXT")
     String description;
 
     @OneToMany(mappedBy = "creator")

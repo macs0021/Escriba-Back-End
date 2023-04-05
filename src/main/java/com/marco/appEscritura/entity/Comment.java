@@ -1,56 +1,46 @@
 package com.marco.appEscritura.entity;
 
+import com.marco.appEscritura.dto.CommentDTO;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Data
+@AllArgsConstructor
 public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-    String content;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String text;
+
     @ManyToOne
-    Document commentedDocument;
+    private User postedBy;
+    @Column(nullable = false)
+    private LocalDateTime postedAt;
+
     @ManyToOne
-    User postedBy;
-    @OneToMany
-    List<Comment> responses;
-    @ManyToOne
-    Comment respondingTo;
+    Document postedIn;
+
     public Comment() {
-        responses = new ArrayList<>();
-    }
-    public long getId() {
-        return id;
+        this.postedAt = LocalDateTime.now();
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public Comment(String text, User user, Document postedIn) {
+        this.text = text;
+        this.postedBy = user;
+        this.postedAt = LocalDateTime.now();
+        this.postedIn = postedIn;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-   public Document getCommentedDocument() {
-        return commentedDocument;
-    }
-
-    public void setCommentedDocument(Document commentedDocument) {
-        this.commentedDocument = commentedDocument;
-    }
-
-    public User getPostedBy() {
-        return postedBy;
-    }
-
-    public void setPostedBy(User postedBy) {
-        this.postedBy = postedBy;
+    public CommentDTO toDto(){
+        return new CommentDTO(id,text,postedBy.username,postedAt,postedIn.getId());
     }
 }

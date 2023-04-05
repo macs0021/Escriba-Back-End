@@ -23,14 +23,12 @@ public class ReadingController {
 
     @PostMapping
     public ResponseEntity<Void> createReading(@RequestBody ReadingDTO readingDto) {
-        System.out.println("CREANDO LECTURA");
         readingService.createReading(readingDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/get/{username}/{documentID}")
     public ResponseEntity<ReadingDTO> getReading(@PathVariable String username, @PathVariable Long documentID) {
-        System.out.println("PEDIDO " +documentID + " " + username);
         Reading reading = readingService.getReading(username, documentID);
         if (reading != null)
             return ResponseEntity.status(HttpStatus.OK).body(reading.toDto());
@@ -41,7 +39,6 @@ public class ReadingController {
 
     @PutMapping
     public ResponseEntity<Void> modifyReading(@RequestBody ReadingDTO readingDto) {
-        System.out.println("MODIFICANDO LECTURA");
         readingService.modifyReading(readingDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

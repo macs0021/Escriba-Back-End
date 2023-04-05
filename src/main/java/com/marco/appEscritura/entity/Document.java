@@ -38,7 +38,7 @@ public class Document implements Serializable {
     @ManyToMany(mappedBy = "savedDocuments")
     List<User> savedBy;
 
-    @OneToMany(mappedBy = "commentedDocument")
+    @OneToMany(mappedBy = "postedIn")
     List<Comment> comments;
     @ManyToOne
     User creator;

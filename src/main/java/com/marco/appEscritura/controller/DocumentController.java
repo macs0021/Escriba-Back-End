@@ -38,11 +38,11 @@ public class DocumentController {
     }
 
     @PutMapping
-    public Long updateDocument(@RequestBody DocumentDTO documentDto) {
+    public DocumentDTO updateDocument(@RequestBody DocumentDTO documentDto) {
 
         System.out.println("POSTING " + documentDto.getId() + " " + documentDto.getPrivateText());
 
-        return documentService.updateDocument(documentDto);
+        return documentService.updateDocument(documentDto).toDto();
     }
 
     @PostMapping
@@ -63,20 +63,17 @@ public class DocumentController {
 
     @PostMapping("/saved/{username}")
     public ResponseEntity<Void> UserSavesDocument(@PathVariable String username, @RequestParam Long savedDocument) {
-        System.out.println(username + " Saving document: " + savedDocument);
         documentService.userSavesDocument(username, savedDocument);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     @DeleteMapping("/saved/{username}")
     public ResponseEntity<Void> UserUnsavesDocument(@PathVariable String username, @RequestParam Long savedDocument) {
-        System.out.println(username + " Saving document: " + savedDocument);
         documentService.userUnsavesDocument(username, savedDocument);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/saved/{username}")
     public Iterable<DocumentDTO> getDocumentsSavedBy(@PathVariable String username) {
-        System.out.println("Getting saved documents of " + username);
         Iterable<Document> documents = documentService.getDocumentSavedBy(username);
         Collection<Document> documentCollection = new ArrayList<>();
         documents.forEach(documentCollection::add);
@@ -87,7 +84,6 @@ public class DocumentController {
 
     @GetMapping("/read/{username}")
     public Iterable<DocumentDTO> getDocumentsBeingReadBy(@PathVariable String username) {
-        System.out.println("Getting reading documents of " + username);
         Iterable<Document> documents = documentService.getDocumentsBeingReadBy(username);
         Collection<Document> documentCollection = new ArrayList<>();
         documents.forEach(documentCollection::add);
@@ -98,7 +94,6 @@ public class DocumentController {
 
     @DeleteMapping("/{documentId}")
     public void deleteDocument(@PathVariable long documentId) {
-        System.out.println("BORRANDO");
         documentService.deleteDocument(documentId);
     }
 
