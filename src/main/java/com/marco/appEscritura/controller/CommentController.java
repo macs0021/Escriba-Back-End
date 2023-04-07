@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/comments")
@@ -24,11 +25,12 @@ public class CommentController {
         System.out.println("Recibiendo comentario: " + commentDTO.getText());
         return commentService.saveComment(commentDTO).toDto();
     }
-
-    @GetMapping("/{document}")
-    public List<CommentDTO> getCommentsFromDocument(@PathVariable Long document){
-        return Collections.EMPTY_LIST;
+    @GetMapping("/{document}/review")
+    public List<CommentDTO> getReviewsFromDocument(@PathVariable Long document){
+        return commentService.getReviewsOfDocument(document).stream().map(Comment::toDto).collect(Collectors.toList());
     }
+
+
 
 
 }

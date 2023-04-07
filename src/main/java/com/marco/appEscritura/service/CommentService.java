@@ -36,14 +36,15 @@ public class CommentService {
         return null;
     }
 
-
     public List<Comment> getResponsesForReview(Long reviewId) {
         /*return commentRepository.findResponsesByReviewId(reviewId);*/
         return null;
     }
 
-    public List<Comment> getReviewsOfDocument(Long Document){
-        return null;
+    public List<Review> getReviewsOfDocument(Long documentId){
+        Document document = documentService.getDocument(documentId);
+
+        return document.getReviews();
     }
 
 
@@ -55,10 +56,10 @@ public class CommentService {
     public Response DTOtoResponse(CommentDTO commentDTO){
         User user = userService.getByUsername(commentDTO.getPostedBy());
         Document document = documentService.getDocument(commentDTO.getPostedIn());
-        Optional<Review> respondingReview = reviewRepository.findById(commentDTO.getResponding());
-        if (!respondingReview.isPresent()){}
+        Optional<Comment> respondingReview = reviewRepository.findById(commentDTO.getResponding());
+        if (!respondingReview.isPresent() || !(respondingReview.get() instanceof Review)){}
             //Excepcion
 
-        return new Response(commentDTO.getText(), user, document, respondingReview.get());
+        return new Response(commentDTO.getText(), user, document, (Review)respondingReview.get());
     }
 }

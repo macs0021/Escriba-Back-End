@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @Transactional
-public interface ReviewRepository extends CrudRepository<Review, Long> {
+public interface ReviewRepository extends CommentRepository {
 
 
 }

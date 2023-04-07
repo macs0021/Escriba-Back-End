@@ -66,6 +66,7 @@ public class DocumentController {
         documentService.userSavesDocument(username, savedDocument);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
     @DeleteMapping("/saved/{username}")
     public ResponseEntity<Void> UserUnsavesDocument(@PathVariable String username, @RequestParam Long savedDocument) {
         documentService.userUnsavesDocument(username, savedDocument);
@@ -93,8 +94,9 @@ public class DocumentController {
     }
 
     @DeleteMapping("/{documentId}")
-    public void deleteDocument(@PathVariable long documentId) {
+    public ResponseEntity<Void> deleteDocument(@PathVariable long documentId) {
         documentService.deleteDocument(documentId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 

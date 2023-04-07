@@ -39,7 +39,7 @@ public class Document implements Serializable {
     List<User> savedBy;
 
     @OneToMany(mappedBy = "postedIn")
-    List<Comment> comments;
+    List<Review> reviews;
     @ManyToOne
     User creator;
 
@@ -52,7 +52,7 @@ public class Document implements Serializable {
         cover = " ";
         synopsis = " ";
         savedBy = new ArrayList<>();
-        comments = new ArrayList<>();
+        reviews = new ArrayList<>();
         genres = new ArrayList<>();
         tags = new ArrayList<>();
     }

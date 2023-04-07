@@ -1,11 +1,13 @@
 package com.marco.appEscritura.entity;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Entity
 @Data
+@DiscriminatorValue("response")
 public class Response extends Comment {
     @ManyToOne
     private Review review;

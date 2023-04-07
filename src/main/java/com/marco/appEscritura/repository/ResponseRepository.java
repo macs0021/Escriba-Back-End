@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @Transactional
-public interface ResponseRepository extends CrudRepository<Response, Long> {
+public interface ResponseRepository extends CommentRepository {
     /*@Query("SELECT c FROM Comment c WHERE c INSTANCE OF Response AND c.review IS NOT NULL AND c.review.id = :reviewId")
     List<Comment> findResponsesByReviewId(@Param("reviewId") Long reviewId);*/
 
