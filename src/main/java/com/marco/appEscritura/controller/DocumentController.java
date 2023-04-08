@@ -3,6 +3,7 @@ package com.marco.appEscritura.controller;
 import com.marco.appEscritura.dto.DocumentDTO;
 import com.marco.appEscritura.entity.Document;
 import com.marco.appEscritura.service.DocumentService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,9 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get document by ID",
+            description = "Returns a DocumentDTO with the info of the requested document by its ID")
+
     public DocumentDTO getDocument(@PathVariable long id) {
 
         DocumentDTO document = documentService.getDocument(id).toDto();

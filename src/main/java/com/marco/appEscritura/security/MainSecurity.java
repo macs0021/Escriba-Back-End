@@ -47,6 +47,7 @@ public class MainSecurity {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeHttpRequests().requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated();
         http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

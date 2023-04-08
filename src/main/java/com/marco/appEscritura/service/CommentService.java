@@ -1,7 +1,9 @@
 package com.marco.appEscritura.service;
 
+import com.marco.appEscritura.Utils.CommentType;
 import com.marco.appEscritura.dto.CommentDTO;
 import com.marco.appEscritura.entity.*;
+import com.marco.appEscritura.repository.CommentRepository;
 import com.marco.appEscritura.repository.ResponseRepository;
 import com.marco.appEscritura.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ public class CommentService {
 
     @Autowired
     private ResponseRepository responseRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
     @Autowired
     private UserService userService;
 
@@ -47,6 +52,33 @@ public class CommentService {
         return document.getReviews();
     }
 
+    public void deleteComment(Long commentId) {
+        commentRepository.deleteById(commentId);
+    }
+
+    public Long updateComment(Long commentId, CommentDTO commentDTO){
+
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        switch (commentDTO.getCommentType()) {
+            case REVIEW:
+                Review review = (Review) commentOptional.get();
+                review.setRating(commentDTO.getRating());
+                review.setText(commentDTO.getText());
+                return reviewRepository.save(review).getId();
+            case RESPONSE:
+                Response response = (Response) commentOptional.get();
+                response.setText(commentDTO.getText());
+                return reviewRepository.save(response).getId();
+
+            case INLINE:
+                return null;
+        }
+
+        return null;
+
+    }
+
 
     public Review DTOtoReview(CommentDTO commentDTO){
         User user = userService.getByUsername(commentDTO.getPostedBy());
@@ -58,8 +90,8 @@ public class CommentService {
         Document document = documentService.getDocument(commentDTO.getPostedIn());
         Optional<Comment> respondingReview = reviewRepository.findById(commentDTO.getResponding());
         if (!respondingReview.isPresent() || !(respondingReview.get() instanceof Review)){}
-            //Excepcion
 
         return new Response(commentDTO.getText(), user, document, (Review)respondingReview.get());
     }
+
 }
