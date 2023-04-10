@@ -33,7 +33,7 @@ public class DocumentController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get document by ID",
-            description = "Returns a DocumentDTO with the info of the requested document by its ID")
+            description = "Returns a DocumentDTO with the info of the requested document by its ID"                     )
 
     public DocumentDTO getDocument(@PathVariable long id) {
 
@@ -44,7 +44,7 @@ public class DocumentController {
     @PutMapping
     public DocumentDTO updateDocument(@RequestBody DocumentDTO documentDto) {
 
-        System.out.println("POSTING " + documentDto.getId() + " " + documentDto.getPrivateText());
+        System.out.println("POSTING " + documentDto.getId() + " " + documentDto.getText());
 
         return documentService.updateDocument(documentDto).toDto();
     }

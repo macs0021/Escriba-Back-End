@@ -18,11 +18,12 @@ public class Document implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    String publicText;
     @Column(columnDefinition = "TEXT", length = 10000)
-    String privateText;
+    String text;
 
     String tittle;
+
+    boolean isPublic;
 
     @Lob
     @Column(columnDefinition = "TEXT")
@@ -47,19 +48,19 @@ public class Document implements Serializable {
     List<Reading> beingRead;
 
     public Document() {
-        privateText = " ";
-        publicText = " ";
+        text = "";
         cover = " ";
         synopsis = " ";
         savedBy = new ArrayList<>();
         reviews = new ArrayList<>();
         genres = new ArrayList<>();
         tags = new ArrayList<>();
+        isPublic = false;
     }
 
     public DocumentDTO toDto() {
         List<String> savedUsersUUID = savedBy.stream().map(user -> user.username).collect(Collectors.toList());
         List<ReadingDTO> readingsDto = beingRead.stream().map(reading -> reading.toDto()).collect(Collectors.toList());
-        return new DocumentDTO(id, tittle, cover, privateText, creator.getUsername(), synopsis, genres, savedUsersUUID, readingsDto);
+        return new DocumentDTO(id, tittle, cover, text, creator.getUsername(), synopsis, genres, savedUsersUUID, readingsDto,isPublic);
     }
 }

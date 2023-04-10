@@ -116,7 +116,7 @@ public class DocumentService {
         document.setId(documentDto.getId());
         document.setSynopsis(documentDto.getSynopsis());
         document.setTittle(documentDto.getTittle());
-        document.setPrivateText(documentDto.getPrivateText());
+        document.setText(documentDto.getText());
         document.setCover(documentDto.getCover());
         document.setCreator(user.get());
         document.setGenres(documentDto.getGenres());
