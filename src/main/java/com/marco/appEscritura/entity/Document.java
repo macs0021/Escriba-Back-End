@@ -36,6 +36,8 @@ public class Document implements Serializable {
 
     List<String> tags;
 
+    int rating;
+
     @ManyToMany(mappedBy = "savedDocuments")
     List<User> savedBy;
 
@@ -56,11 +58,12 @@ public class Document implements Serializable {
         genres = new ArrayList<>();
         tags = new ArrayList<>();
         isPublic = false;
+        rating = 0;
     }
 
     public DocumentDTO toDto() {
         List<String> savedUsersUUID = savedBy.stream().map(user -> user.username).collect(Collectors.toList());
         List<ReadingDTO> readingsDto = beingRead.stream().map(reading -> reading.toDto()).collect(Collectors.toList());
-        return new DocumentDTO(id, tittle, cover, text, creator.getUsername(), synopsis, genres, savedUsersUUID, readingsDto,isPublic);
+        return new DocumentDTO(id, tittle, cover, text, creator.getUsername(), synopsis, genres, savedUsersUUID, readingsDto,isPublic,rating);
     }
 }

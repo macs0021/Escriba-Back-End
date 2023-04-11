@@ -25,6 +25,8 @@ public class DocumentDTO {
 
     List<ReadingDTO> readings;
 
+    int rating;
+
     public DocumentDTO() {
         this.text = "";
         genres = new ArrayList<>();
@@ -32,9 +34,10 @@ public class DocumentDTO {
     public DocumentDTO(long id, String text) {
         this.id = id;
         this.text = text;
+        this.rating = 0;
     }
 
-    public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<String> genres, List<String> savedBy, List<ReadingDTO> readings, boolean isPublic) {
+    public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<String> genres, List<String> savedBy, List<ReadingDTO> readings, boolean isPublic, int rating) {
         System.out.println(genres);
         this.id = id;
         this.tittle = tittle;
@@ -46,5 +49,6 @@ public class DocumentDTO {
         this.savedBy = savedBy;
         this.readings = readings;
         this.isPublic = isPublic;
+        this.rating = rating;
     }
 }

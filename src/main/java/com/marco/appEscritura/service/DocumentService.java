@@ -11,6 +11,8 @@ import com.marco.appEscritura.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -107,6 +109,57 @@ public class DocumentService {
                 .collect(Collectors.toList());
     }
 
+    public Document changeVisibility(long id){
+        Optional<Document> documentOptional = documentRepository.findById(id);
+
+        if(!documentOptional.isPresent()){
+
+        }
+
+        Document document = documentOptional.get();
+        document.setPublic(!document.isPublic());
+
+        return documentRepository.save(document);
+    }
+
+    public List<Document> getDocumentsByGenres(List<String> genres, int page, int pageSize){
+        List<Document> documents = documentRepository.findByGenresIn(genres);
+
+        Comparator<Document> comparator = Comparator.comparing(Document::getRating, Comparator.reverseOrder());
+        Collections.sort(documents, comparator);
+
+        return documents.subList(page, page+pageSize+1);
+
+    }
+
+    public void updateRating(int newRating,int oldRating, long documentID){
+        Optional<Document> optionalDocument = documentRepository.findById(documentID);
+
+        if(!optionalDocument.isPresent()){
+
+        }
+
+        Document document = optionalDocument.get();
+
+        document.setRating((int)((document.getRating()+newRating-oldRating)/document.getReviews().size()));
+
+        documentRepository.save(document);
+    }
+
+    public void addRating(int rating, long documentID){
+        Optional<Document> optionalDocument = documentRepository.findById(documentID);
+
+        if(!optionalDocument.isPresent()){
+
+        }
+
+        Document document = optionalDocument.get();
+
+        document.setRating((int)((document.getRating()+rating)/document.getReviews().size()+1));
+
+        documentRepository.save(document);
+    }
+
 
     private Document DtoToDocument(DocumentDTO documentDto) {
 
@@ -120,6 +173,7 @@ public class DocumentService {
         document.setCover(documentDto.getCover());
         document.setCreator(user.get());
         document.setGenres(documentDto.getGenres());
+        document.setRating(documentDto.getRating());
         List<Reading> readingList = documentDto.getReadings().stream()
                 .map(readingDTO -> readingService.DtoToReading(readingDTO))
                 .collect(Collectors.toList());

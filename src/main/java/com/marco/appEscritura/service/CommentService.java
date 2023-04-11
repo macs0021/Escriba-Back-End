@@ -32,6 +32,7 @@ public class CommentService {
     public Comment saveComment(CommentDTO commentDTO) {
         switch (commentDTO.getCommentType()) {
             case REVIEW:
+                documentService.addRating(commentDTO.getRating(), commentDTO.getPostedIn());
                 return reviewRepository.save(DTOtoReview(commentDTO));
             case RESPONSE:
                 return responseRepository.save(DTOtoResponse(commentDTO));
@@ -62,9 +63,15 @@ public class CommentService {
 
         switch (commentDTO.getCommentType()) {
             case REVIEW:
+
+
                 Review review = (Review) commentOptional.get();
+
+                documentService.updateRating(commentDTO.getRating(), review.getRating(), review.getPostedIn().getId());
+
                 review.setRating(commentDTO.getRating());
                 review.setText(commentDTO.getText());
+
                 return reviewRepository.save(review).getId();
             case RESPONSE:
                 Response response = (Response) commentOptional.get();
@@ -78,8 +85,6 @@ public class CommentService {
         return null;
 
     }
-
-
     public Review DTOtoReview(CommentDTO commentDTO){
         User user = userService.getByUsername(commentDTO.getPostedBy());
         Document document = documentService.getDocument(commentDTO.getPostedIn());

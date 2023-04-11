@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -101,6 +102,23 @@ public class DocumentController {
     public ResponseEntity<Void> deleteDocument(@PathVariable long documentId) {
         documentService.deleteDocument(documentId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/{documentId}/visibility")
+    public ResponseEntity<DocumentDTO> changeVisibility(@PathVariable long documentId){
+
+        return ResponseEntity.status(HttpStatus.OK).body(documentService.changeVisibility(documentId).toDto());
+    }
+
+    @GetMapping(params = {"genres", "page", "pageSize"})
+    public List<DocumentDTO> getDocumentsByGenreAndPage(
+            @RequestParam("genres") List<String> genres,
+            @RequestParam("page") int page,
+            @RequestParam("pageSize") int pageSize) {
+
+        return documentService.getDocumentsByGenres(genres,page,pageSize).stream()
+                .map(document -> document.toDto())
+                .collect(Collectors.toList());
     }
 
 
