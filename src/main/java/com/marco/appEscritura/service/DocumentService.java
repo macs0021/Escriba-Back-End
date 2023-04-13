@@ -11,10 +11,7 @@ import com.marco.appEscritura.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,8 +76,21 @@ public class DocumentService {
     }
 
 
-    public Document updateDocument(DocumentDTO documentDto) {
-        return documentRepository.save(DtoToDocument(documentDto));
+    public Document updateDocument(long id,DocumentDTO documentDto) {
+
+        Optional<Document> documentOptional = documentRepository.findById(id);
+
+        if(!documentOptional.isPresent()){}
+
+        Document document = documentOptional.get();
+
+        document.setText(documentDto.getText());
+        document.setGenres(documentDto.getGenres());
+        document.setTittle(documentDto.getTittle());
+        document.setCover(documentDto.getCover());
+        document.setSynopsis(documentDto.getSynopsis());
+
+        return documentRepository.save(document);
     }
 
     public Iterable<Document> getDocumentsCreatedBy(String username) {
@@ -122,18 +132,24 @@ public class DocumentService {
         return documentRepository.save(document);
     }
 
-    public List<Document> getDocumentsByGenres(List<String> genres, int page, int pageSize){
-        List<Document> documents = documentRepository.findByGenresIn(genres);
+    public Iterable<Document> getDocumentsByGenres(List<String> genres, int page, int pageSize){
 
-        Comparator<Document> comparator = Comparator.comparing(Document::getRating, Comparator.reverseOrder());
-        Collections.sort(documents, comparator);
+        Iterable<Document> documents = documentRepository.findAllByGenres(genres);
 
-        return documents.subList(page, page+pageSize+1);
+        //Comparator<Document> comparator = Comparator.comparing(Document::getRating, Comparator.reverseOrder());
+        //Collections.sort(documents, comparator);
+
+        //int startIndex = page * pageSize;
+        //int endIndex = Math.min(startIndex + pageSize, documents.size());
+
+        return documents;
 
     }
 
     public void updateRating(int newRating,int oldRating, long documentID){
         Optional<Document> optionalDocument = documentRepository.findById(documentID);
+
+        System.out.println("PUTTING COMMENT");
 
         if(!optionalDocument.isPresent()){
 
@@ -149,13 +165,15 @@ public class DocumentService {
     public void addRating(int rating, long documentID){
         Optional<Document> optionalDocument = documentRepository.findById(documentID);
 
+        System.out.println("POSTING COMMENT");
+
         if(!optionalDocument.isPresent()){
 
         }
 
         Document document = optionalDocument.get();
 
-        document.setRating((int)((document.getRating()+rating)/document.getReviews().size()+1));
+        document.setRating((int)((document.getRating()+rating)/(document.getReviews().size()+1)));
 
         documentRepository.save(document);
     }

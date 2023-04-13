@@ -2,11 +2,16 @@ package com.marco.appEscritura.controller;
 
 import com.marco.appEscritura.dto.DocumentDTO;
 import com.marco.appEscritura.entity.Document;
+import com.marco.appEscritura.entity.User;
+import com.marco.appEscritura.repository.DocumentRepository;
+import com.marco.appEscritura.repository.UserRepository;
+import com.marco.appEscritura.security.LoggedUserProvider;
 import com.marco.appEscritura.service.DocumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,6 +26,13 @@ public class DocumentController {
 
     @Autowired
     private DocumentService documentService;
+    @Autowired
+    private DocumentRepository documentRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private LoggedUserProvider loggedUserProvider;
 
     @GetMapping
     public Iterable<DocumentDTO> getAllDocuments() {
@@ -42,12 +54,12 @@ public class DocumentController {
         return document;
     }
 
-    @PutMapping
-    public DocumentDTO updateDocument(@RequestBody DocumentDTO documentDto) {
+    @PutMapping("/{id}")
+    public DocumentDTO updateDocument(@PathVariable long id, @RequestBody DocumentDTO documentDto) {
 
         System.out.println("POSTING " + documentDto.getId() + " " + documentDto.getText());
 
-        return documentService.updateDocument(documentDto).toDto();
+        return documentService.updateDocument(id,documentDto).toDto();
     }
 
     @PostMapping
@@ -105,18 +117,30 @@ public class DocumentController {
     }
 
     @PatchMapping("/{documentId}/visibility")
-    public ResponseEntity<DocumentDTO> changeVisibility(@PathVariable long documentId){
+    public ResponseEntity<DocumentDTO> changeVisibility(@PathVariable long documentId, Authentication authentication){
+
+        if (loggedUserProvider.getCurrentUser().getId().equals(documentRepository.findById(documentId).get().getCreator().getId())){
+            ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         return ResponseEntity.status(HttpStatus.OK).body(documentService.changeVisibility(documentId).toDto());
     }
 
-    @GetMapping(params = {"genres", "page", "pageSize"})
-    public List<DocumentDTO> getDocumentsByGenreAndPage(
+    @GetMapping("/genres")
+    public Iterable<DocumentDTO> getDocumentsByGenreAndPage(
             @RequestParam("genres") List<String> genres,
             @RequestParam("page") int page,
             @RequestParam("pageSize") int pageSize) {
 
-        return documentService.getDocumentsByGenres(genres,page,pageSize).stream()
+        System.out.println("ENTRO EN LA BUSQUEDA");
+        System.out.println("BUSCANDO: " + genres);
+
+        Iterable<Document> documents = documentService.getDocumentsByGenres(genres,page,pageSize);
+
+        Collection<Document> documentCollection = new ArrayList<>();
+
+        documents.forEach(documentCollection::add);
+        return documentCollection.stream()
                 .map(document -> document.toDto())
                 .collect(Collectors.toList());
     }

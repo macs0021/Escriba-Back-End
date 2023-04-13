@@ -32,6 +32,9 @@ public class Document implements Serializable {
     @Lob
     @Column(columnDefinition = "TEXT")
     String cover;
+    @ElementCollection
+    @CollectionTable(name = "document_genres", joinColumns = @JoinColumn(name = "document_id"))
+    @Column(name = "genre")
     List<String> genres;
 
     List<String> tags;
