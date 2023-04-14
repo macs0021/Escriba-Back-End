@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class DocumentService {
@@ -33,9 +34,17 @@ public class DocumentService {
         return documentOptional.get();
     }
 
-    public Iterable<Document> getAllDocuments() {
-        Iterable<Document> documents = documentRepository.findAll();
-        return documents;
+    public Iterable<Document> getAllDocuments(int page, int pageSize) {
+        List<Document> documents = documentRepository.findAllOrderByRatingAndTitle();
+
+        int startIndex = page * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, documents.size());
+
+        if(startIndex>=documents.size()){
+            return Collections.emptyList();
+        }
+
+        return documents.subList(startIndex, endIndex);
     }
 
     public Long createDocument(DocumentDTO documentDto) {
@@ -134,15 +143,16 @@ public class DocumentService {
 
     public Iterable<Document> getDocumentsByGenres(List<String> genres, int page, int pageSize){
 
-        Iterable<Document> documents = documentRepository.findAllByGenres(genres);
+        List<Document> documents = documentRepository.findAllByGenres(genres);
 
-        //Comparator<Document> comparator = Comparator.comparing(Document::getRating, Comparator.reverseOrder());
-        //Collections.sort(documents, comparator);
+        int startIndex = page * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, documents.size());
 
-        //int startIndex = page * pageSize;
-        //int endIndex = Math.min(startIndex + pageSize, documents.size());
+        if(startIndex>=documents.size()){
+            return Collections.emptyList();
+        }
 
-        return documents;
+        return documents.subList(startIndex, endIndex);
 
     }
 

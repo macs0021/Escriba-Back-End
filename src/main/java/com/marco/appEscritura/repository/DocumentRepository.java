@@ -17,7 +17,10 @@ import java.util.Optional;
 public interface DocumentRepository extends CrudRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE d.creator.username = ?1")
     Optional<List<Document>> findByCreatorUsername(String username);
-    @Query("SELECT DISTINCT d FROM Document d JOIN d.genres g WHERE g IN (?1) AND d.isPublic = true")
-    Iterable<Document> findAllByGenres(List<String> genres);
+    @Query("SELECT DISTINCT d FROM Document d JOIN d.genres g WHERE g IN (?1) AND d.isPublic = true ORDER BY d.rating DESC, d.tittle ASC")
+    List<Document> findAllByGenres(List<String> genres);
+
+    @Query("SELECT DISTINCT d FROM Document d WHERE d.isPublic = false ORDER BY d.rating DESC, d.tittle ASC")
+    List<Document> findAllOrderByRatingAndTitle();
 
 }

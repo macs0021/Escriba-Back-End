@@ -34,11 +34,17 @@ public class DocumentController {
     @Autowired
     private LoggedUserProvider loggedUserProvider;
 
-    @GetMapping
-    public Iterable<DocumentDTO> getAllDocuments() {
-        Iterable<Document> documents = documentService.getAllDocuments();
+    @GetMapping("/all")
+    public Iterable<DocumentDTO> getAllDocuments(@RequestParam("page") int page,
+                                                 @RequestParam("pageSize") int pageSize) {
+        System.out.println("Page " + page);
+        Iterable<Document> documents = documentService.getAllDocuments(page, pageSize);
+
         Collection<Document> documentCollection = new ArrayList<>();
         documents.forEach(documentCollection::add);
+
+        System.out.println("llegando con tamaño: " + documentCollection.size());
+
         return documentCollection.stream()
                 .map(document -> document.toDto())
                 .collect(Collectors.toList());
