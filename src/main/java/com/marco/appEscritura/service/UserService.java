@@ -88,11 +88,9 @@ public class UserService {
         if (!followingUser.getFollowers().contains(followerUser)) {
             followingUser.getFollowers().add(followerUser);
             followerUser.getFollowing().add(followingUser);
-            System.out.println("siguiendo...");
         } else {
             followingUser.getFollowers().remove(followerUser);
             followerUser.getFollowing().remove(followingUser);
-            System.out.println("dejando de seguir...");
         }
 
         userRepository.save(followerUser);

@@ -24,13 +24,13 @@ public class CommentController {
     CommentService commentService;
 
     @PostMapping
-    public CommentDTO saveComment(@RequestBody CommentDTO commentDTO) {
+    public ResponseEntity<CommentDTO> saveComment(@RequestBody CommentDTO commentDTO) {
         System.out.println("Recibiendo comentario: " + commentDTO.getText());
-        return commentService.saveComment(commentDTO).toDto();
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment(commentDTO).toDto());
     }
     @GetMapping("/{document}/review")
-    public List<CommentDTO> getReviewsFromDocument(@PathVariable Long document){
-        return commentService.getReviewsOfDocument(document).stream().map(Comment::toDto).collect(Collectors.toList());
+    public ResponseEntity<List<CommentDTO>> getReviewsFromDocument(@PathVariable Long document){
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getReviewsOfDocument(document).stream().map(Comment::toDto).collect(Collectors.toList()));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id){
@@ -43,6 +43,15 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(commentID,commentDTO));
     }
 
+    @PostMapping("/{reviewID}/replies")
+    public ResponseEntity<CommentDTO> createReply(@PathVariable Long reviewID, @RequestBody CommentDTO commentDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment(commentDTO).toDto());
+    }
+
+    @GetMapping("/{reviewID}/replies")
+    public ResponseEntity<List<CommentDTO>> getRepliesOfReview(@PathVariable Long reviewID){
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getResponsesOfReview(reviewID).stream().map(Comment::toDto).collect(Collectors.toList()));
+    }
 
 
 

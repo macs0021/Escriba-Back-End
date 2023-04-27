@@ -35,16 +35,35 @@ public class CommentService {
                 documentService.addRating(commentDTO.getRating(), commentDTO.getPostedIn());
                 return reviewRepository.save(DTOtoReview(commentDTO));
             case RESPONSE:
-                return responseRepository.save(DTOtoResponse(commentDTO));
+                System.out.println("Intentando guardar respuesta " + commentDTO.toString());
+
+                Optional<Comment> optionalReview = reviewRepository.findById(commentDTO.getResponding());
+                if(!optionalReview.isPresent()){
+
+                }
+                Review review = (Review) optionalReview.get();
+                Response response = DTOtoResponse(commentDTO);
+
+                response.setReview(review);
+
+                reviewRepository.save(review);
+
+                return responseRepository.save(response);
             case INLINE:
                 return null;
         }
         return null;
     }
 
-    public List<Comment> getResponsesForReview(Long reviewId) {
-        /*return commentRepository.findResponsesByReviewId(reviewId);*/
-        return null;
+    public List<Response> getResponsesOfReview(Long reviewId) {
+        Optional<Comment> optionalReview = reviewRepository.findById(reviewId);
+
+        if(!optionalReview.isPresent()){
+
+        }
+
+        Review review = (Review) optionalReview.get();
+        return review.getResponses();
     }
 
     public List<Review> getReviewsOfDocument(Long documentId){

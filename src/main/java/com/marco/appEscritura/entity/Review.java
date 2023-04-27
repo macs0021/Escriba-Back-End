@@ -13,7 +13,6 @@ import java.util.List;
 @DiscriminatorValue("review")
 @Data
 public class Review extends Comment {
-    @Column(nullable = false)
     private int rating;
 
     public Review() {

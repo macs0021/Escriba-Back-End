@@ -31,6 +31,7 @@ public class DocumentService {
         if (!documentOptional.isPresent()) {
             throw new NotExistingDocument("The document " + documentOptional.get().getTittle() + " does not exist");
         }
+        System.out.println("GETTING DOCUMENT WITH TEXT: " + documentOptional.get().getText() + " AND TITTLE: " + documentOptional.get().getTittle());
         return documentOptional.get();
     }
 
@@ -200,6 +201,7 @@ public class DocumentService {
         document.setText(documentDto.getText());
         document.setCover(documentDto.getCover());
         document.setCreator(user.get());
+
         document.setGenres(documentDto.getGenres());
         document.setRating(documentDto.getRating());
         List<Reading> readingList = documentDto.getReadings().stream()
