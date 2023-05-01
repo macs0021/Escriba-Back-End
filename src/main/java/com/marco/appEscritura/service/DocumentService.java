@@ -26,6 +26,9 @@ public class DocumentService {
     @Autowired
     ReadingService readingService;
 
+    @Autowired
+    private ActivityService activityService;
+
     public Document getDocument(Long id) {
         Optional<Document> documentOptional = documentRepository.findById(id);
         if (!documentOptional.isPresent()) {
@@ -53,9 +56,11 @@ public class DocumentService {
         Document document = DtoToDocument(documentDto);
         User user = userRepository.findOneByUsername(documentDto.getCreatorUsername()).get();
         user.getCreated().add(document);
-        Long id = documentRepository.save(document).getId();
+        Document savedDocument = documentRepository.save(document);
         userRepository.save(user);
-        return id;
+
+        activityService.createDocumentCreationEvent(user.getUsername(),savedDocument.getId());
+        return savedDocument.getId();
 
     }
 
@@ -134,6 +139,9 @@ public class DocumentService {
 
         if(!documentOptional.isPresent()){
 
+        }
+        if(documentOptional.get().isPublic()){
+            activityService.createDocumentCreationEvent(documentOptional.get().getCreator().getUsername(),documentOptional.get().getId());
         }
 
         Document document = documentOptional.get();

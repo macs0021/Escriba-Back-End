@@ -26,6 +26,9 @@ public class ReadingService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private ActivityService activityService;
+
     public void createReading(ReadingDTO readingDTO) {
 
         User user = userRepository.findOneByUsername(readingDTO.getUsername()).get();
@@ -36,6 +39,8 @@ public class ReadingService {
 
         if (reading.isPresent()) {
         }
+
+        activityService.startedReadingEvent(user.getUsername(), document.getId());
 
         user.getReading().add(DtoToReading(readingDTO));
         document.getBeingRead().add(DtoToReading(readingDTO));

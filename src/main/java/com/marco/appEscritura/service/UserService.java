@@ -22,12 +22,15 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ActivityService activityService;
+
     public Optional<User> getById(UUID id) {
         return userRepository.findById(id);
     }
 
     public User getByUsername(String username) {
-
+        System.out.println("PIDIENDO USUARIO CON NOMBRE " + username);
         Optional<User> user = userRepository.findOneByUsername(username);
         if (!user.isPresent()) {
             //excepcion
@@ -93,6 +96,7 @@ public class UserService {
             followerUser.getFollowing().remove(followingUser);
         }
 
+        activityService.createFollowEvent(followingUser.getUsername(), followerUser.getUsername());
         userRepository.save(followerUser);
         userRepository.save(followingUser);
     }

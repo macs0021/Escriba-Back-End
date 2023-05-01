@@ -52,6 +52,14 @@ public class CommentController {
     public ResponseEntity<List<CommentDTO>> getRepliesOfReview(@PathVariable Long reviewID){
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getResponsesOfReview(reviewID).stream().map(Comment::toDto).collect(Collectors.toList()));
     }
+    @GetMapping("/reviews/{reviewID}")
+    public ResponseEntity<CommentDTO> getReviewByID(@PathVariable Long reviewID){
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getReviewByID(reviewID).toDto());
+    }
+    @GetMapping("/responses/{responseID}")
+    public ResponseEntity<CommentDTO> getResponseByID(@PathVariable Long responseID){
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getResponseByID(responseID).toDto());
+    }
 
 
 
