@@ -8,6 +8,7 @@ import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.exceptions.NotExistingDocument;
 import com.marco.appEscritura.repository.DocumentRepository;
 import com.marco.appEscritura.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
+@Transactional
 public class DocumentService {
     @Autowired
     DocumentRepository documentRepository;
@@ -34,7 +36,6 @@ public class DocumentService {
         if (!documentOptional.isPresent()) {
             throw new NotExistingDocument("The document " + documentOptional.get().getTittle() + " does not exist");
         }
-        System.out.println("GETTING DOCUMENT WITH TEXT: " + documentOptional.get().getText() + " AND TITTLE: " + documentOptional.get().getTittle());
         return documentOptional.get();
     }
 
@@ -168,8 +169,6 @@ public class DocumentService {
     public void updateRating(int newRating,int oldRating, long documentID){
         Optional<Document> optionalDocument = documentRepository.findById(documentID);
 
-        System.out.println("PUTTING COMMENT");
-
         if(!optionalDocument.isPresent()){
 
         }
@@ -184,8 +183,6 @@ public class DocumentService {
     public void addRating(int rating, long documentID){
         Optional<Document> optionalDocument = documentRepository.findById(documentID);
 
-        System.out.println("POSTING COMMENT");
-
         if(!optionalDocument.isPresent()){
 
         }
@@ -199,8 +196,6 @@ public class DocumentService {
 
 
     private Document DtoToDocument(DocumentDTO documentDto) {
-
-        System.out.println(documentDto);
         Optional<User> user = userRepository.findOneByUsername(documentDto.getCreatorUsername());
         Document document = new Document();
         document.setId(documentDto.getId());

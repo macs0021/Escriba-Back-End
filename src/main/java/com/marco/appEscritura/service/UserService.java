@@ -30,7 +30,6 @@ public class UserService {
     }
 
     public User getByUsername(String username) {
-        System.out.println("PIDIENDO USUARIO CON NOMBRE " + username);
         Optional<User> user = userRepository.findOneByUsername(username);
         if (!user.isPresent()) {
             //excepcion

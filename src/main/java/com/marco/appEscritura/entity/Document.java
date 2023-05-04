@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -62,6 +60,7 @@ public class Document implements Serializable {
         tags = new ArrayList<>();
         isPublic = false;
         rating = 0;
+        beingRead = Collections.EMPTY_LIST;
     }
 
     public DocumentDTO toDto() {

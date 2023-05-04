@@ -8,6 +8,7 @@ import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.repository.DocumentRepository;
 import com.marco.appEscritura.repository.ReadingRepository;
 import com.marco.appEscritura.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ReadingService {
 
     @Autowired
@@ -41,12 +43,11 @@ public class ReadingService {
         }
 
         activityService.startedReadingEvent(user.getUsername(), document.getId());
-
+        readingRepository.save(DtoToReading(readingDTO));
         user.getReading().add(DtoToReading(readingDTO));
         document.getBeingRead().add(DtoToReading(readingDTO));
         userRepository.save(user);
         documentRepository.save(document);
-        readingRepository.save(DtoToReading(readingDTO));
     }
 
     public Reading getReading(String username, long documentID) {
@@ -65,12 +66,10 @@ public class ReadingService {
     }
 
     public void modifyReading(ReadingDTO readingDTO){
-        System.out.println("Modifying reading with scroll: " + readingDTO.getReadingSpot() + ";" + "Username: " + readingDTO.getUsername() + " document: " + readingDTO.getDocument());
         readingRepository.save(DtoToReading(readingDTO));
     }
 
     public Reading DtoToReading(ReadingDTO readingDTO) {
-        System.out.println("Username: " + readingDTO.getUsername() + " document: " + readingDTO.getDocument());
         User user = userRepository.findOneByUsername(readingDTO.getUsername()).get();
         Document document = documentRepository.findById(readingDTO.getDocument()).get();
         return new Reading(user, document, readingDTO.getReadingSpot());

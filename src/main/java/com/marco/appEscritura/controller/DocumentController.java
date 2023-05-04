@@ -37,13 +37,10 @@ public class DocumentController {
     @GetMapping("/all")
     public Iterable<DocumentDTO> getAllDocuments(@RequestParam("page") int page,
                                                  @RequestParam("pageSize") int pageSize) {
-        System.out.println("Page " + page);
         Iterable<Document> documents = documentService.getAllDocuments(page, pageSize);
 
         Collection<Document> documentCollection = new ArrayList<>();
         documents.forEach(documentCollection::add);
-
-        System.out.println("llegando con tamaño: " + documentCollection.size());
 
         return documentCollection.stream()
                 .map(document -> document.toDto())
@@ -63,14 +60,11 @@ public class DocumentController {
     @PutMapping("/{id}")
     public DocumentDTO updateDocument(@PathVariable long id, @RequestBody DocumentDTO documentDto) {
 
-        System.out.println("POSTING " + documentDto.getId() + " " + documentDto.getText());
-
         return documentService.updateDocument(id,documentDto).toDto();
     }
 
     @PostMapping
     public Long createDocument(@RequestBody DocumentDTO documentDto) {
-        System.out.println("POSTING " + documentDto);
         return documentService.createDocument(documentDto);
     }
 
@@ -137,9 +131,6 @@ public class DocumentController {
             @RequestParam("genres") List<String> genres,
             @RequestParam("page") int page,
             @RequestParam("pageSize") int pageSize) {
-
-        System.out.println("ENTRO EN LA BUSQUEDA");
-        System.out.println("BUSCANDO: " + genres);
 
         Iterable<Document> documents = documentService.getDocumentsByGenres(genres,page,pageSize);
 

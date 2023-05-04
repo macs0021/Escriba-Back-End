@@ -3,6 +3,7 @@ package com.marco.appEscritura.service;
 import com.marco.appEscritura.Utils.EntityType;
 import com.marco.appEscritura.entity.ActivityEvent;
 import com.marco.appEscritura.repository.ActivityEventRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class ActivityService {
 
     @Autowired

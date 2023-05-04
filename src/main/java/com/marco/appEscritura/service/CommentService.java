@@ -6,6 +6,7 @@ import com.marco.appEscritura.entity.*;
 import com.marco.appEscritura.repository.CommentRepository;
 import com.marco.appEscritura.repository.ResponseRepository;
 import com.marco.appEscritura.repository.ReviewRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class CommentService {
     @Autowired
     private ReviewRepository reviewRepository;
@@ -42,7 +44,6 @@ public class CommentService {
                 return review;
 
             case RESPONSE:
-                System.out.println("Intentando guardar respuesta " + commentDTO.toString());
 
                 Optional<Comment> optionalReview = reviewRepository.findById(commentDTO.getResponding());
                 if (!optionalReview.isPresent()) {

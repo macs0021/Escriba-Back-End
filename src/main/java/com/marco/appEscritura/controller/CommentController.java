@@ -25,7 +25,6 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentDTO> saveComment(@RequestBody CommentDTO commentDTO) {
-        System.out.println("Recibiendo comentario: " + commentDTO.getText());
         return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment(commentDTO).toDto());
     }
     @GetMapping("/{document}/review")
