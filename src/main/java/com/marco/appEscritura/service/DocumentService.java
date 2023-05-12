@@ -40,7 +40,7 @@ public class DocumentService {
     }
 
     public Iterable<Document> getAllDocuments(int page, int pageSize) {
-        List<Document> documents = documentRepository.findAllOrderByRatingAndTitle();
+        /*List<Document> documents = documentRepository.findAllOrderByRatingAndTitle();
 
         int startIndex = page * pageSize;
         int endIndex = Math.min(startIndex + pageSize, documents.size());
@@ -49,7 +49,10 @@ public class DocumentService {
             return Collections.emptyList();
         }
 
-        return documents.subList(startIndex, endIndex);
+        return documents.subList(startIndex, endIndex);*/
+
+        int offset = page * pageSize;
+        return documentRepository.getPageDocuments(pageSize,offset);
     }
 
     public Long createDocument(DocumentDTO documentDto) {
@@ -153,16 +156,11 @@ public class DocumentService {
 
     public Iterable<Document> getDocumentsByGenres(List<String> genres, int page, int pageSize){
 
-        List<Document> documents = documentRepository.findAllByGenres(genres);
+        int offset = page * pageSize;
 
-        int startIndex = page * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, documents.size());
+        List<Document> documents = documentRepository.findAllByGenres(genres, pageSize, offset);
 
-        if(startIndex>=documents.size()){
-            return Collections.emptyList();
-        }
-
-        return documents.subList(startIndex, endIndex);
+        return documents;
 
     }
 

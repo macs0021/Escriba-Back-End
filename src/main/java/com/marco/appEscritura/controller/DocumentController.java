@@ -132,6 +132,9 @@ public class DocumentController {
             @RequestParam("page") int page,
             @RequestParam("pageSize") int pageSize) {
 
+
+        System.out.println("Recibiendo petición controlador");
+
         Iterable<Document> documents = documentService.getDocumentsByGenres(genres,page,pageSize);
 
         Collection<Document> documentCollection = new ArrayList<>();
