@@ -117,6 +117,34 @@ public class DocumentService {
         return user.get().getCreated().stream().collect(Collectors.toList());
     }
 
+    public Iterable<Document> getPublicDocumentsCreatedBy(String username) {
+        Optional<User> user = userRepository.findOneByUsername(username);
+        if (user.isPresent()) {
+            System.out.println("Enviando publicos");
+            List<Document> publicDocuments = user.get().getCreated().stream()
+                    .filter(Document::isPublic)
+                    .collect(Collectors.toList());
+            return publicDocuments;
+        } else {
+            System.out.println("Usuario no encontrado");
+            return Collections.emptyList();
+        }
+    }
+
+    public Iterable<Document> getPrivateDocumentsCreatedBy(String username) {
+        Optional<User> user = userRepository.findOneByUsername(username);
+        if (user.isPresent()) {
+            System.out.println("Enviando privados");
+            List<Document> privateDocuments = user.get().getCreated().stream()
+                    .filter(document -> !document.isPublic())
+                    .collect(Collectors.toList());
+            return privateDocuments;
+        } else {
+            System.out.println("Usuario no encontrado");
+            return Collections.emptyList();
+        }
+    }
+
     public Iterable<Document> getDocumentSavedBy(String username) {
         Optional<User> user = userRepository.findOneByUsername(username);
         return user.get().getSavedDocuments().stream().collect(Collectors.toList());
@@ -154,11 +182,11 @@ public class DocumentService {
         return documentRepository.save(document);
     }
 
-    public Iterable<Document> getDocumentsByGenres(List<String> genres, int page, int pageSize){
+    public Iterable<Document> getDocumentsByGenres(List<String> genres,String tittleFragment, int page, int pageSize){
 
         int offset = page * pageSize;
 
-        List<Document> documents = documentRepository.findAllByGenres(genres, pageSize, offset);
+        List<Document> documents = documentRepository.findAllByGenresAndTittleFragment(genres,tittleFragment, pageSize, offset, genres.size());
 
         return documents;
 
@@ -209,6 +237,7 @@ public class DocumentService {
                 .map(readingDTO -> readingService.DtoToReading(readingDTO))
                 .collect(Collectors.toList());
         document.setBeingRead(readingList);
+        document.setPublic(documentDto.isPublic());
         return document;
 
     }

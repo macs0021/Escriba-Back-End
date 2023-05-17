@@ -38,6 +38,14 @@ public class UserService {
         return user.get();
     }
 
+    public List<User> getByFragment(String fragment){
+        return userRepository.findByUsernameContaining(fragment);
+    }
+
+    public List<User> getRecommendationFor(String username){
+        return userRepository.findRandomUsersFromFollowers(username);
+    }
+
     public void updateUser(UUID id, UserDTO userDTO) {
         Optional<User> userOptional = userRepository.findById(id);
 

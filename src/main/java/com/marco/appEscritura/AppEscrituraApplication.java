@@ -30,161 +30,173 @@ import java.util.List;
 @SpringBootApplication
 public class AppEscrituraApplication implements CommandLineRunner {
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@Autowired
-	private DocumentService documentService;
+    @Autowired
+    private DocumentService documentService;
 
-	@Autowired
-	private CommentService commentService;
+    @Autowired
+    private CommentService commentService;
 
-	@Autowired
-	private ReadingService readingService;
-
-
-	public static void main(String[] args) {
-		SpringApplication.run(AppEscrituraApplication.class, args);
-	}
-
-	@Override
-	public void run(String... args) {
-
-		List<String> imageUrls = new ArrayList<>();
-		try (BufferedReader reader = Files.newBufferedReader(Paths.get("src/main/java/com/marco/appEscritura/starterData/resultado.txt"))) {
-			String line;
-			boolean test = true;
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("Image URL:")) {
-					String imageUrl = line.substring(line.indexOf("[\"")+2, line.lastIndexOf("\"]"));
-					imageUrls.add(imageUrl);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    @Autowired
+    private ReadingService readingService;
 
 
+    public static void main(String[] args) {
+        SpringApplication.run(AppEscrituraApplication.class, args);
+    }
 
-		//System.out.println("MUESTRO PORTADA NUMERO 0: " + imageUrls.get(0));
-		// Crear usuario
-		int userCount = 20;
-		List<User> users = new ArrayList<>();
-		for (int i = 1; i <= userCount; i++) {
-			User user = new User("user" + i, "password" + i, "user" + i + "@example.com");
+    @Override
+    public void run(String... args) {
 
-			String baseUrl = "https://ui-avatars.com/api/?name=%s&background=333&color=f3f3f3&size=512";
-			String urlStr = String.format(baseUrl, user.getUsername());
-			String result = "";
-
-			try (InputStream in = new URL(urlStr).openStream()) {
-				byte[] imageBytes = IOUtils.toByteArray(in);
-				 result =  Base64.getEncoder().encodeToString(imageBytes);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			user.setImage(result);
-			users.add(userService.save(user));
-		}
+        List<String> imageUrls = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get("src/main/java/com/marco/appEscritura/starterData/resultado.txt"))) {
+            String line;
+            boolean test = true;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("Image URL:")) {
+                    String imageUrl = line.substring(line.indexOf("[\"") + 2, line.lastIndexOf("\"]"));
+                    imageUrls.add(imageUrl);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
-		// Hacer que todos los usuarios se sigan entre ellos
-		for (User user : users) {
-			for (User otherUser : users) {
-				if (!user.getUsername().equals(otherUser.getUsername())) {
-					userService.updateFollowers(otherUser.getUsername(),user.getUsername());
-				}
-			}
-		}
+        //System.out.println("MUESTRO PORTADA NUMERO 0: " + imageUrls.get(0));
+        // Crear usuario
+        int userCount = 20;
+        List<User> users = new ArrayList<>();
+        for (int i = 1; i <= userCount; i++) {
+            User user = new User("user" + i, "password" + i, "user" + i + "@example.com");
 
-		List<String> genres = Arrays.asList(
-				"Novel",
-				"Short Story",
-				"Poetry",
-				"Drama",
-				"Science Fiction",
-				"Fantasy",
-				"Horror",
-				"Mystery",
-				"Romance",
-				"Adventure",
-				"Humor",
-				"Historical",
-				"Detective",
-				"Western",
-				"Dystopian",
-				"Realistic",
-				"Juvenile",
-				"Children's",
-				"History",
-				"Biography and Memoir",
-				"Self-Help and Personal Development",
-				"Business and Finance",
-				"Politics and Current Affairs",
-				"Travel",
-				"Food and Gastronomy",
-				"Art and Photography",
-				"Sports and Outdoor Activities",
-				"Education and Reference",
-				"Science and Technology",
-				"Religion and Spirituality",
-				"Environment and Ecology",
-				"Philosophy and Thought",
-				"Sociology and Anthropology",
-				"Journalism and Essays"
-		);
+            String baseUrl = "https://ui-avatars.com/api/?name=%s&background=333&color=f3f3f3&size=512";
+            String urlStr = String.format(baseUrl, user.getUsername());
+            String result = "";
 
-		int documentCount = userCount * 3;
-		List<Document> documents = new ArrayList<>();
-		for (int i = 1; i <= documentCount; i++) {
-			Random random = new Random();
-			int numGenres = random.nextInt(3) + 2; // Genera un número aleatorio entre 2 y 4
-			Document document = new Document();
+            try (InputStream in = new URL(urlStr).openStream()) {
+                byte[] imageBytes = IOUtils.toByteArray(in);
+                result = Base64.getEncoder().encodeToString(imageBytes);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            user.setImage(result);
+            users.add(userService.save(user));
+        }
 
-			List<String> documentGenres = new ArrayList<>();
-			for (int k = 0; k < numGenres; k++) {
-				int randomIndex = random.nextInt(genres.size());
-				String genre = genres.get(randomIndex);
-				documentGenres.add(genre);
-			}
 
-			document.setGenres(documentGenres);
-			document.setTittle("Documento " + i);
-			document.setCreator(users.get((i - 1) / 3));
-			document.setText("Texto del documento " + i);
-			document.setRating(i);
-			document.setCover("data:image/png;base64," + imageUrls.get(i-1));
-			documents.add(documentService.getDocument(documentService.createDocument(document.toDto())));
-			document.setBeingRead(Collections.EMPTY_LIST);
-		}
+        // Hacer que todos los usuarios se sigan entre ellos
+        for (User user : users) {
+            for (User otherUser : users) {
+                if (!user.getUsername().equals(otherUser.getUsername())) {
+                    userService.updateFollowers(otherUser.getUsername(), user.getUsername());
+                }
+            }
+        }
 
-		// Crear comentarios, reseñas, respuestas y lecturas
-		for (int i = 0; i < users.size(); i++) {
-			for (int j = 0; j < documents.size(); j++) {
+        List<String> genres = Arrays.asList(
+                "Novel",
+                "Short Story",
+                "Poetry",
+                "Drama",
+                "Science Fiction",
+                "Fantasy",
+                "Horror",
+                "Mystery",
+                "Romance",
+                "Adventure",
+                "Humor",
+                "Historical",
+                "Detective",
+                "Western",
+                "Dystopian",
+                "Realistic",
+                "Juvenile",
+                "Children's",
+                "History",
+                "Biography and Memoir",
+                "Self-Help and Personal Development",
+                "Business and Finance",
+                "Politics and Current Affairs",
+                "Travel",
+                "Food and Gastronomy",
+                "Art and Photography",
+                "Sports and Outdoor Activities",
+                "Education and Reference",
+                "Science and Technology",
+                "Religion and Spirituality",
+                "Environment and Ecology",
+                "Philosophy and Thought",
+                "Sociology and Anthropology",
+                "Journalism and Essays"
+        );
 
-				// Crear reseña
-				Review review = new Review("Reseña " + (i * documents.size() + j + 1), users.get(i), documents.get(j), j + 1);
+        int documentCount = userCount * 3;
+        List<Document> documents = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 1; i <= documentCount; i++) {
+            int numGenres = random.nextInt(3) + 2; // Genera un número aleatorio entre 2 y 4
+            Document document = new Document();
 
-				CommentDTO reviewDto = review.toDto();
-				reviewDto.setCommentType(CommentType.REVIEW);
+            List<String> documentGenres = new ArrayList<>();
+            for (int k = 0; k < numGenres; k++) {
+                int randomIndex = random.nextInt(genres.size());
+                String genre = genres.get(randomIndex);
+                documentGenres.add(genre);
+            }
 
-				Long reviewID = commentService.saveComment(reviewDto).getId();
+            document.setGenres(documentGenres);
+            document.setTittle("Documento " + i);
+            document.setCreator(users.get((i - 1) / 3));
+            document.setText("Texto del documento " + i);
+            document.setRating(i);
+            document.setSynopsis("Sinopsis de prueba, esto debería de aparecer correctamente en el documento");
+            document.setCover("data:image/png;base64," + imageUrls.get(i - 1));
 
-				review.setId(reviewID);
+            // Determina si el documento es público o privado
+            int userDocumentCount = (i % 3 == 0) ? 3 : i % 3; // Esto da 1, 2, 3 para cada grupo de 3 documentos
+            if (userDocumentCount == 3) {
+                document.setPublic(false); // Suponiendo que esta es la función para hacerlo privado
+            } else {
+                document.setPublic(true); // Suponiendo que esta es la función para hacerlo público
+            }
 
-				// Crear respuesta
-				Response response = new Response("Respuesta " + (i * documents.size() + j + 1), users.get(i), documents.get(j), review);
+            documents.add(documentService.getDocument(documentService.createDocument(document.toDto())));
+            document.setBeingRead(Collections.EMPTY_LIST);
+        }
 
-				CommentDTO responseDto = response.toDto();
-				responseDto.setCommentType(CommentType.RESPONSE);
+        // Crear comentarios, reseñas, respuestas y lecturas
+        for (int i = 0; i < users.size(); i++) {
+            for (int j = 0; j < documents.size(); j++) {
 
-				commentService.saveComment(responseDto);
+                // Crear reseña
 
-				// Crear lectura
-				Reading reading = new Reading(users.get(i), documents.get(j), (float) (j + 1) / 10);
-				readingService.createReading(reading.toDto());
-			}
-		}
-	}
+                int randomReview = random.nextInt(5) + 1;
+
+                Review review = new Review("Reseña " + (i * documents.size() + j + 1), users.get(i), documents.get(j), randomReview);
+
+                CommentDTO reviewDto = review.toDto();
+                reviewDto.setCommentType(CommentType.REVIEW);
+
+                Long reviewID = commentService.saveComment(reviewDto).getId();
+
+                review.setId(reviewID);
+
+                // Crear respuesta
+                Response response = new Response("Respuesta " + (i * documents.size() + j + 1), users.get(i), documents.get(j), review);
+
+                CommentDTO responseDto = response.toDto();
+                responseDto.setCommentType(CommentType.RESPONSE);
+
+                commentService.saveComment(responseDto);
+
+                // Crear lectura
+                Reading reading = new Reading(users.get(i), documents.get(j), (float) (j + 1) / 10);
+                readingService.createReading(reading.toDto());
+            }
+        }
+    }
 
 }

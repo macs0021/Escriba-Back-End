@@ -32,6 +32,20 @@ public class UserController {
         return userService.getByUsername(username).toDto();
     }
 
+    @GetMapping("/contains/{usernameFragment}")
+    public  ResponseEntity<List<UserDTO>> getByContains(@PathVariable String usernameFragment){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getByFragment(usernameFragment).stream()
+                .map(user -> user.toDto())
+                .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/recommendations/{username}")
+    public  ResponseEntity<List<UserDTO>> getRecommendationsFor(@PathVariable String username){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getRecommendationFor(username).stream()
+                .map(user -> user.toDto())
+                .collect(Collectors.toList()));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateUser(@PathVariable UUID id, @RequestBody UserDTO userDTO){
         userService.updateUser(id,userDTO);

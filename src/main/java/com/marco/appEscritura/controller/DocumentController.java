@@ -78,6 +78,26 @@ public class DocumentController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/public/{username}")
+    public Iterable<DocumentDTO> getDocumentsPublicDocumentsBy(@PathVariable String username) {
+        Iterable<Document> documents = documentService.getPublicDocumentsCreatedBy(username);
+        Collection<Document> documentCollection = new ArrayList<>();
+        documents.forEach(documentCollection::add);
+        return documentCollection.stream()
+                .map(document -> document.toDto())
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/private/{username}")
+    public Iterable<DocumentDTO> getDocumentsPrivateDocumentsBy(@PathVariable String username) {
+        Iterable<Document> documents = documentService.getPrivateDocumentsCreatedBy(username);
+        Collection<Document> documentCollection = new ArrayList<>();
+        documents.forEach(documentCollection::add);
+        return documentCollection.stream()
+                .map(document -> document.toDto())
+                .collect(Collectors.toList());
+    }
+
     @PostMapping("/saved/{username}")
     public ResponseEntity<Void> UserSavesDocument(@PathVariable String username, @RequestParam Long savedDocument) {
         documentService.userSavesDocument(username, savedDocument);
@@ -130,12 +150,12 @@ public class DocumentController {
     public Iterable<DocumentDTO> getDocumentsByGenreAndPage(
             @RequestParam("genres") List<String> genres,
             @RequestParam("page") int page,
-            @RequestParam("pageSize") int pageSize) {
-
+            @RequestParam("pageSize") int pageSize,
+            @RequestParam("tittleFragment") String tittleFragment){
 
         System.out.println("Recibiendo petición controlador");
 
-        Iterable<Document> documents = documentService.getDocumentsByGenres(genres,page,pageSize);
+        Iterable<Document> documents = documentService.getDocumentsByGenres(genres,tittleFragment,page,pageSize);
 
         Collection<Document> documentCollection = new ArrayList<>();
 
