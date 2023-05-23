@@ -38,7 +38,6 @@ public class DocumentDTO {
     }
 
     public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<String> genres, List<String> savedBy, List<ReadingDTO> readings, boolean isPublic, int rating) {
-        System.out.println(genres);
         this.id = id;
         this.tittle = tittle;
         this.cover = cover;

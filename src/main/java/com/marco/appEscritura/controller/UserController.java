@@ -32,6 +32,11 @@ public class UserController {
         return userService.getByUsername(username).toDto();
     }
 
+    @GetMapping("/exists/{username}")
+    public boolean existsUsername(@PathVariable String username){
+        return userService.checkExistence(username);
+    }
+
     @GetMapping("/contains/{usernameFragment}")
     public  ResponseEntity<List<UserDTO>> getByContains(@PathVariable String usernameFragment){
         return ResponseEntity.status(HttpStatus.OK).body(userService.getByFragment(usernameFragment).stream()

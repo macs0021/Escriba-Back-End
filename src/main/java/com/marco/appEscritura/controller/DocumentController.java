@@ -57,6 +57,11 @@ public class DocumentController {
         return document;
     }
 
+    @GetMapping("/recommendation")
+    public  ResponseEntity<DocumentDTO> getRecommendation() {
+         return ResponseEntity.ok(documentService.findMostLikedPost().get().toDto());
+    }
+
     @PutMapping("/{id}")
     public DocumentDTO updateDocument(@PathVariable long id, @RequestBody DocumentDTO documentDto) {
 

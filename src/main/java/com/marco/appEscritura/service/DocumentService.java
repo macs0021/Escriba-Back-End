@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -201,23 +202,39 @@ public class DocumentService {
 
         Document document = optionalDocument.get();
 
-        document.setRating((int)((document.getRating()+newRating-oldRating)/document.getReviews().size()));
+        document.setRating((int)(((double)document.getRating() * document.getReviews().size()) + newRating - oldRating) / document.getReviews().size());
 
         documentRepository.save(document);
     }
 
-    public void addRating(int rating, long documentID){
+    public void addRating(int rating, long documentID) {
         Optional<Document> optionalDocument = documentRepository.findById(documentID);
 
-        if(!optionalDocument.isPresent()){
-
+        if (!optionalDocument.isPresent()) {
+            // Realiza alguna acción apropiada si el documento no está presente
+            return;
         }
 
         Document document = optionalDocument.get();
+        int totalReviews = document.getReviews().size();
+        int currentRatingSum = document.getRating() * totalReviews;
+        int newRatingSum = currentRatingSum + rating;
 
-        document.setRating((int)((document.getRating()+rating)/(document.getReviews().size()+1)));
+        double newRatingAverage = (double) newRatingSum / (totalReviews + 1);
+        int newRatingRounded = (int) Math.round(newRatingAverage);
+
+        document.setRating(newRatingRounded);
 
         documentRepository.save(document);
+    }
+
+    public Optional<Document> findMostLikedPost() {
+
+        Optional<Document> mostLikedPost = documentRepository.findRandomMostLikedPost();
+        if (mostLikedPost.isPresent()) {
+            return mostLikedPost;
+        }
+        return Optional.empty();
     }
 
 
@@ -238,6 +255,7 @@ public class DocumentService {
                 .collect(Collectors.toList());
         document.setBeingRead(readingList);
         document.setPublic(documentDto.isPublic());
+        document.setRating(documentDto.getRating());
         return document;
 
     }

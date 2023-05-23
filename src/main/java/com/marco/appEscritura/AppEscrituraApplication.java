@@ -192,11 +192,13 @@ public class AppEscrituraApplication implements CommandLineRunner {
 
                 commentService.saveComment(responseDto);
 
-                // Crear lectura
-                Reading reading = new Reading(users.get(i), documents.get(j), (float) (j + 1) / 10);
-                readingService.createReading(reading.toDto());
+
+                if(documents.get(j).isPublic()) {
+                    Reading reading = new Reading(users.get(i), documents.get(j), (float) (j + 1) / 10);
+                    readingService.createReading(reading.toDto());
+                }
             }
         }
+        System.out.println("Terminada generación de datos");
     }
-
 }

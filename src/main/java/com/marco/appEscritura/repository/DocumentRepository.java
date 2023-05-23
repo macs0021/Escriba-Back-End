@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -25,5 +26,9 @@ public interface DocumentRepository extends CrudRepository<Document, Long> {
     @Query(value = "SELECT * FROM Document ORDER BY rating, tittle LIMIT ?1 OFFSET ?2",
             nativeQuery = true)
     Iterable<Document> getPageDocuments(int pageSize, int offset);
+
+    @Query("SELECT d FROM Document d WHERE d.isPublic = true AND d.rating = (SELECT MAX(d.rating) FROM Document d) ORDER BY RAND() LIMIT 1  ")
+    Optional<Document> findRandomMostLikedPost();
+
 
 }

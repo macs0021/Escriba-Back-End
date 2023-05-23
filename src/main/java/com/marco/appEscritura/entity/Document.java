@@ -4,6 +4,8 @@ import com.marco.appEscritura.dto.DocumentDTO;
 import com.marco.appEscritura.dto.ReadingDTO;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.util.*;
@@ -42,12 +44,14 @@ public class Document implements Serializable {
     @ManyToMany(mappedBy = "savedDocuments")
     List<User> savedBy;
 
-    @OneToMany(mappedBy = "postedIn")
+    @OneToMany(mappedBy = "postedIn", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     List<Review> reviews;
     @ManyToOne
     User creator;
 
-    @OneToMany(mappedBy = "beingRead")
+    @OneToMany(mappedBy = "beingRead", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     List<Reading> beingRead;
 
     public Document() {

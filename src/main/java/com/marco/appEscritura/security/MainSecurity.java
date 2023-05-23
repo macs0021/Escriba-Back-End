@@ -48,6 +48,7 @@ public class MainSecurity {
 
         http.authorizeHttpRequests().requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/user/exists/**").permitAll()
                 .anyRequest().authenticated();
         http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

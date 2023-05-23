@@ -38,6 +38,10 @@ public class UserService {
         return user.get();
     }
 
+    public boolean checkExistence(String username){
+        return userRepository.findOneByUsername(username).isPresent();
+    }
+
     public List<User> getByFragment(String fragment){
         return userRepository.findByUsernameContaining(fragment);
     }
