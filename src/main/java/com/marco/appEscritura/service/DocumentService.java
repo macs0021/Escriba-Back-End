@@ -207,6 +207,23 @@ public class DocumentService {
         documentRepository.save(document);
     }
 
+    public boolean checkPublic(long documentId){
+        Optional<Document> documentOptional = documentRepository.findById(documentId);
+
+        if(!documentOptional.isPresent()){
+
+        }
+        return documentOptional.get().isPublic();
+    }
+    public boolean checkOwner(String username, long documentId){
+        Optional<Document> documentOptional = documentRepository.findById(documentId);
+
+        if(!documentOptional.isPresent()){
+
+        }
+
+        return documentOptional.get().getCreator().getUsername() == username;
+    }
     public void addRating(int rating, long documentID) {
         Optional<Document> optionalDocument = documentRepository.findById(documentID);
 
