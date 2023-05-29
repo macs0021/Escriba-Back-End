@@ -3,6 +3,8 @@ package com.marco.appEscritura.service;
 import com.marco.appEscritura.Utils.CommentType;
 import com.marco.appEscritura.dto.CommentDTO;
 import com.marco.appEscritura.entity.*;
+import com.marco.appEscritura.exceptions.Comment.AlreadyExistingReview;
+import com.marco.appEscritura.exceptions.Comment.NotExistingComment;
 import com.marco.appEscritura.repository.CommentRepository;
 import com.marco.appEscritura.repository.ResponseRepository;
 import com.marco.appEscritura.repository.ReviewRepository;
@@ -17,37 +19,42 @@ import java.util.Optional;
 @Transactional
 public class CommentService {
     @Autowired
-    private ReviewRepository reviewRepository;
+    ReviewRepository reviewRepository;
 
     @Autowired
-    private ResponseRepository responseRepository;
+    ResponseRepository responseRepository;
 
     @Autowired
-    private CommentRepository commentRepository;
+    CommentRepository commentRepository;
     @Autowired
-    private UserService userService;
+    UserService userService;
 
     @Autowired
-    private DocumentService documentService;
+    DocumentService documentService;
 
     @Autowired
-    private ActivityService activityService;
+    ActivityService activityService;
 
 
     public Comment saveComment(CommentDTO commentDTO) {
         switch (commentDTO.getCommentType()) {
             case REVIEW:
-                documentService.addRating(commentDTO.getRating(), commentDTO.getPostedIn());
+                Optional<Review> reviewOptional =
+                        reviewRepository.findReviewByPostedIn_IdAndPostedBy_Username(commentDTO.getPostedIn(), commentDTO.getPostedBy());
 
+                if(reviewOptional.isPresent()){
+                    throw new AlreadyExistingReview("Review by " + commentDTO.getPostedBy() + " in " + commentDTO.getPostedIn() + " does already exist");
+                }
+
+                documentService.addRating(commentDTO.getRating(), commentDTO.getPostedIn());
                 Review review = reviewRepository.save(DTOtoReview(commentDTO));
                 activityService.createdReviewEvent(review.getPostedBy().getUsername(), review.getId());
                 return review;
 
             case RESPONSE:
-
                 Optional<Comment> optionalReview = reviewRepository.findById(commentDTO.getResponding());
                 if (!optionalReview.isPresent()) {
-
+                    throw new NotExistingComment("Review with id: " + commentDTO.getResponding() + " does not exist");
                 }
                 Review reviewResponse = (Review) optionalReview.get();
 
@@ -57,11 +64,11 @@ public class CommentService {
 
                 reviewRepository.save(reviewResponse);
 
-                response = responseRepository.save(response);
+                 Response finalResponse = responseRepository.save(response);
 
-                activityService.replyToReviewEvent(response.getPostedBy().getUsername(), response.getId());
+                activityService.replyToReviewEvent(response.getPostedBy().getUsername(), finalResponse.getId());
 
-                return response;
+                return finalResponse;
             case INLINE:
                 return null;
         }
@@ -72,7 +79,7 @@ public class CommentService {
         Optional<Comment> reviewOptional = reviewRepository.findById(reviewID);
 
         if (!reviewOptional.isPresent()) {
-
+            throw new NotExistingComment("Review with id: "+ reviewID + " does not exist");
         }
 
         return (Review) reviewOptional.get();
@@ -82,9 +89,8 @@ public class CommentService {
         Optional<Comment> responseOptional = responseRepository.findById(responseID);
 
         if (!responseOptional.isPresent()) {
-
+            throw new NotExistingComment("Reply with id: "+ responseID + " does not exist");
         }
-
         return (Response) responseOptional.get();
     }
 
@@ -92,7 +98,7 @@ public class CommentService {
         Optional<Comment> optionalReview = reviewRepository.findById(reviewId);
 
         if (!optionalReview.isPresent()) {
-
+            throw new NotExistingComment("Review with id: "+ reviewId + " does not exist");
         }
 
         Review review = (Review) optionalReview.get();
@@ -101,24 +107,23 @@ public class CommentService {
 
     public List<Review> getReviewsOfDocument(Long documentId) {
         Document document = documentService.getDocument(documentId);
-
         return document.getReviews();
     }
 
     public void deleteComment(Long commentId) {
+        Optional<Comment> optionalComment = commentRepository.findById(commentId);
+        if(!optionalComment.isPresent()) throw new NotExistingComment("Comment with id: " + commentId + " does not exist");
         commentRepository.deleteById(commentId);
     }
 
     public Long updateComment(Long commentId, CommentDTO commentDTO) {
-
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        if(!commentOptional.isPresent()) throw new NotExistingComment("Comment with id: " + commentId + " does not exist");
 
         switch (commentDTO.getCommentType()) {
             case REVIEW:
-
-
                 Review review = (Review) commentOptional.get();
-
                 documentService.updateRating(commentDTO.getRating(), review.getRating(), review.getPostedIn().getId());
 
                 review.setRating(commentDTO.getRating());

@@ -21,6 +21,7 @@ public class Comment {
     private Long id;
 
     @Column(nullable = false)
+    @Lob
     private String text;
 
     @ManyToOne

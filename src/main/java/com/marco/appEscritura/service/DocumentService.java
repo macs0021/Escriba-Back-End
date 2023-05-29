@@ -3,19 +3,17 @@ package com.marco.appEscritura.service;
 import com.marco.appEscritura.dto.DocumentDTO;
 import com.marco.appEscritura.entity.Document;
 import com.marco.appEscritura.entity.Reading;
-import com.marco.appEscritura.entity.ReadingID;
 import com.marco.appEscritura.entity.User;
-import com.marco.appEscritura.exceptions.NotExistingDocument;
+import com.marco.appEscritura.exceptions.Document.NotExistingDocument;
+import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.repository.DocumentRepository;
 import com.marco.appEscritura.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -30,7 +28,7 @@ public class DocumentService {
     ReadingService readingService;
 
     @Autowired
-    private ActivityService activityService;
+    ActivityService activityService;
 
     public Document getDocument(Long id) {
         Optional<Document> documentOptional = documentRepository.findById(id);
@@ -41,19 +39,8 @@ public class DocumentService {
     }
 
     public Iterable<Document> getAllDocuments(int page, int pageSize) {
-        /*List<Document> documents = documentRepository.findAllOrderByRatingAndTitle();
-
-        int startIndex = page * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, documents.size());
-
-        if(startIndex>=documents.size()){
-            return Collections.emptyList();
-        }
-
-        return documents.subList(startIndex, endIndex);*/
-
         int offset = page * pageSize;
-        return documentRepository.getPageDocuments(pageSize,offset);
+        return documentRepository.getPageDocuments(pageSize, offset);
     }
 
     public Long createDocument(DocumentDTO documentDto) {
@@ -62,16 +49,28 @@ public class DocumentService {
         User user = userRepository.findOneByUsername(documentDto.getCreatorUsername()).get();
         user.getCreated().add(document);
         Document savedDocument = documentRepository.save(document);
+
         userRepository.save(user);
 
-        activityService.createDocumentCreationEvent(user.getUsername(),savedDocument.getId());
+        activityService.createDocumentCreationEvent(user.getUsername(), savedDocument.getId());
         return savedDocument.getId();
 
     }
 
     public void userSavesDocument(String username, Long documentId) {
-        User user = userRepository.findOneByUsername(username).get();
-        Document document = documentRepository.findById(documentId).get();
+        Optional<User> userOptional = userRepository.findOneByUsername(username);
+        Optional<Document> documentOptional = documentRepository.findById(documentId);
+
+        if(!userOptional.isPresent()){
+            throw new NotExistingUser("User with username: " + username + " does not exist");
+        }
+
+        if(!documentOptional.isPresent()){
+            throw new NotExistingDocument("Document with id: " + documentId + " does not exist");
+        }
+
+        Document document = documentOptional.get();
+        User user = userOptional.get();
 
         document.getSavedBy().add(user);
 
@@ -82,9 +81,20 @@ public class DocumentService {
         documentRepository.save(document);
     }
 
-    public void userUnsavesDocument(String username, Long documentId) {
-        User user = userRepository.findOneByUsername(username).get();
-        Document document = documentRepository.findById(documentId).get();
+    public void userUnsavedDocument(String username, Long documentId) {
+        Optional<User> userOptional = userRepository.findOneByUsername(username);
+        Optional<Document> documentOptional = documentRepository.findById(documentId);
+
+        if(!userOptional.isPresent()){
+            throw new NotExistingUser("User with username: " + username + " does not exist");
+        }
+
+        if(!documentOptional.isPresent()){
+            throw new NotExistingDocument("Document with id: " + documentId + " does not exist");
+        }
+
+        Document document = documentOptional.get();
+        User user = userOptional.get();
 
         document.getSavedBy().remove(user);
 
@@ -96,11 +106,13 @@ public class DocumentService {
     }
 
 
-    public Document updateDocument(long id,DocumentDTO documentDto) {
+    public Document updateDocument(long id, DocumentDTO documentDto) {
 
         Optional<Document> documentOptional = documentRepository.findById(id);
 
-        if(!documentOptional.isPresent()){}
+        if (!documentOptional.isPresent()) {
+            throw new NotExistingDocument("Document with id: " + id + " does not exist");
+        }
 
         Document document = documentOptional.get();
 
@@ -115,51 +127,60 @@ public class DocumentService {
 
     public Iterable<Document> getDocumentsCreatedBy(String username) {
         Optional<User> user = userRepository.findOneByUsername(username);
+
+        if(!user.isPresent()){
+            throw new NotExistingUser("User with username: " + username + " does not exist");
+        }
         return user.get().getCreated().stream().collect(Collectors.toList());
     }
 
     public Iterable<Document> getPublicDocumentsCreatedBy(String username) {
         Optional<User> user = userRepository.findOneByUsername(username);
-        if (user.isPresent()) {
-            System.out.println("Enviando publicos");
-            List<Document> publicDocuments = user.get().getCreated().stream()
-                    .filter(Document::isPublic)
-                    .collect(Collectors.toList());
-            return publicDocuments;
-        } else {
-            System.out.println("Usuario no encontrado");
-            return Collections.emptyList();
+        if (!user.isPresent()) {
+            throw new NotExistingUser("User with username: " + username + " does not exist");
         }
+        List<Document> publicDocuments = user.get().getCreated().stream()
+                .filter(Document::isPublic)
+                .collect(Collectors.toList());
+        return publicDocuments;
     }
 
     public Iterable<Document> getPrivateDocumentsCreatedBy(String username) {
         Optional<User> user = userRepository.findOneByUsername(username);
-        if (user.isPresent()) {
-            System.out.println("Enviando privados");
-            List<Document> privateDocuments = user.get().getCreated().stream()
-                    .filter(document -> !document.isPublic())
-                    .collect(Collectors.toList());
-            return privateDocuments;
-        } else {
-            System.out.println("Usuario no encontrado");
-            return Collections.emptyList();
+        if (!user.isPresent()) {
+            throw new NotExistingUser("User with username: " + username + " does not exist");
         }
+        List<Document> privateDocuments = user.get().getCreated().stream()
+                .filter(document -> !document.isPublic())
+                .collect(Collectors.toList());
+        return privateDocuments;
     }
 
     public Iterable<Document> getDocumentSavedBy(String username) {
         Optional<User> user = userRepository.findOneByUsername(username);
+
+        if(!user.isPresent()){
+            throw new NotExistingUser("User with username: " + username + " does not exist");
+        }
+
         return user.get().getSavedDocuments().stream().collect(Collectors.toList());
     }
 
     public void deleteDocument(long id) {
+        Optional<Document> documentOptional = documentRepository.findById(id);
+
+        if(!documentOptional.isPresent()){
+            throw new NotExistingDocument("Document with id: " + id + " does not exist");
+        }
+
         documentRepository.deleteById(id);
     }
 
-    public List<Document> getDocumentsBeingReadBy(String username){
+    public List<Document> getDocumentsBeingReadBy(String username) {
         Optional<User> user = userRepository.findOneByUsername(username);
 
-        if(!user.isPresent()){
-            //Excepcion
+        if (!user.isPresent()) {
+            throw new NotExistingUser("User with username: " + username + " does not exist");
         }
 
         return user.get().getReading().stream()
@@ -167,14 +188,14 @@ public class DocumentService {
                 .collect(Collectors.toList());
     }
 
-    public Document changeVisibility(long id){
+    public Document changeVisibility(long id) {
         Optional<Document> documentOptional = documentRepository.findById(id);
 
-        if(!documentOptional.isPresent()){
-
+        if (!documentOptional.isPresent()) {
+            throw new NotExistingDocument("Document with id: " + id + " does not exist");
         }
-        if(documentOptional.get().isPublic()){
-            activityService.createDocumentCreationEvent(documentOptional.get().getCreator().getUsername(),documentOptional.get().getId());
+        if (documentOptional.get().isPublic()) {
+            activityService.createDocumentCreationEvent(documentOptional.get().getCreator().getUsername(), documentOptional.get().getId());
         }
 
         Document document = documentOptional.get();
@@ -183,53 +204,53 @@ public class DocumentService {
         return documentRepository.save(document);
     }
 
-    public Iterable<Document> getDocumentsByGenres(List<String> genres,String tittleFragment, int page, int pageSize){
+    public Iterable<Document> getDocumentsByGenres(List<String> genres, String tittleFragment, int page, int pageSize) {
 
         int offset = page * pageSize;
 
-        List<Document> documents = documentRepository.findAllByGenresAndTittleFragment(genres,tittleFragment, pageSize, offset, genres.size());
+        List<Document> documents = documentRepository.findAllByGenresAndTittleFragment(genres, tittleFragment, pageSize, offset, genres.size());
 
         return documents;
 
     }
 
-    public void updateRating(int newRating,int oldRating, long documentID){
+    public void updateRating(int newRating, int oldRating, long documentID) {
         Optional<Document> optionalDocument = documentRepository.findById(documentID);
 
-        if(!optionalDocument.isPresent()){
-
+        if (!optionalDocument.isPresent()) {
+            throw new NotExistingDocument("Document with id: " + documentID + " does not exist");
         }
 
         Document document = optionalDocument.get();
 
-        document.setRating((int)(((double)document.getRating() * document.getReviews().size()) + newRating - oldRating) / document.getReviews().size());
+        document.setRating((int) (((double) document.getRating() * document.getReviews().size()) + newRating - oldRating) / document.getReviews().size());
 
         documentRepository.save(document);
     }
 
-    public boolean checkPublic(long documentId){
+    public boolean checkPublic(long documentId) {
         Optional<Document> documentOptional = documentRepository.findById(documentId);
 
-        if(!documentOptional.isPresent()){
-
+        if (!documentOptional.isPresent()) {
+            throw new NotExistingDocument("Document with id: " + documentId + " does not exist");
         }
         return documentOptional.get().isPublic();
     }
-    public boolean checkOwner(String username, long documentId){
+
+    public boolean checkOwner(String username, long documentId) {
         Optional<Document> documentOptional = documentRepository.findById(documentId);
 
-        if(!documentOptional.isPresent()){
-
+        if (!documentOptional.isPresent()) {
+            throw new NotExistingDocument("Document with id: " + documentId + " does not exist");
         }
-
         return documentOptional.get().getCreator().getUsername() == username;
     }
+
     public void addRating(int rating, long documentID) {
         Optional<Document> optionalDocument = documentRepository.findById(documentID);
 
         if (!optionalDocument.isPresent()) {
-            // Realiza alguna acción apropiada si el documento no está presente
-            return;
+            throw new NotExistingDocument("Document with id: " + documentID + " does not exist");
         }
 
         Document document = optionalDocument.get();
@@ -246,7 +267,6 @@ public class DocumentService {
     }
 
     public Optional<Document> findMostLikedPost() {
-
         Optional<Document> mostLikedPost = documentRepository.findRandomMostLikedPost();
         if (mostLikedPost.isPresent()) {
             return mostLikedPost;

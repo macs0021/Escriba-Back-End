@@ -19,7 +19,7 @@ import java.util.UUID;
 public class ReadingController {
 
     @Autowired
-    private ReadingService readingService;
+    ReadingService readingService;
 
     @PostMapping
     public ResponseEntity<Void> createReading(@RequestBody ReadingDTO readingDto) {
@@ -30,11 +30,12 @@ public class ReadingController {
     @GetMapping("/get/{username}/{documentID}")
     public ResponseEntity<ReadingDTO> getReading(@PathVariable String username, @PathVariable Long documentID) {
         Reading reading = readingService.getReading(username, documentID);
-        if (reading != null)
-            return ResponseEntity.status(HttpStatus.OK).body(reading.toDto());
+        return ResponseEntity.status(HttpStatus.OK).body(reading.toDto());
+    }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
+    @GetMapping("/check/{username}/{documentID}")
+    public ResponseEntity<Boolean> checkReading(@PathVariable String username, @PathVariable Long documentID) {
+        return ResponseEntity.status(HttpStatus.OK).body(readingService.checkReading(username,documentID));
     }
 
     @PutMapping

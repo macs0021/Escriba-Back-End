@@ -18,15 +18,12 @@ import java.util.UUID;
 public class ActivityService {
 
     @Autowired
-    private ActivityEventRepository activityEventRepository;
+    ActivityEventRepository activityEventRepository;
 
     public List<ActivityEvent> getRecentActivity(int pageSize, int pageNumber, List<String> usernames) {
-
         int offset = (pageNumber) * pageSize;
-
         Pageable pageable = PageRequest.of(offset, pageSize);
         List<ActivityEvent> page = activityEventRepository.findRecentByUsernames(usernames, pageable);
-
         return page;
     }
 

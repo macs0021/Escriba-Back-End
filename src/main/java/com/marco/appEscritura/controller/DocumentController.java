@@ -49,21 +49,20 @@ public class DocumentController {
     }
 
     @GetMapping("/checkOwner/{documentId}")
-
-    public boolean checkOwner(@PathVariable long documentId){
+    public boolean checkOwner(@PathVariable long documentId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         return documentService.checkOwner(username, documentId);
     }
 
     @GetMapping("/checkPublic/{documentId}")
-    public boolean checkPublic(@PathVariable long documentId){
+    public boolean checkPublic(@PathVariable long documentId) {
         return documentService.checkPublic(documentId);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get document by ID",
-            description = "Returns a DocumentDTO with the info of the requested document by its ID"                     )
+            description = "Returns a DocumentDTO with the info of the requested document by its ID")
 
     public DocumentDTO getDocument(@PathVariable long id) {
 
@@ -72,14 +71,14 @@ public class DocumentController {
     }
 
     @GetMapping("/recommendation")
-    public  ResponseEntity<DocumentDTO> getRecommendation() {
-         return ResponseEntity.ok(documentService.findMostLikedPost().get().toDto());
+    public ResponseEntity<DocumentDTO> getRecommendation() {
+        return ResponseEntity.ok(documentService.findMostLikedPost().get().toDto());
     }
 
     @PutMapping("/{id}")
     public DocumentDTO updateDocument(@PathVariable long id, @RequestBody DocumentDTO documentDto) {
 
-        return documentService.updateDocument(id,documentDto).toDto();
+        return documentService.updateDocument(id, documentDto).toDto();
     }
 
     @PostMapping
@@ -124,8 +123,8 @@ public class DocumentController {
     }
 
     @DeleteMapping("/saved/{username}")
-    public ResponseEntity<Void> UserUnsavesDocument(@PathVariable String username, @RequestParam Long savedDocument) {
-        documentService.userUnsavesDocument(username, savedDocument);
+    public ResponseEntity<Void> UserUnsavedDocument(@PathVariable String username, @RequestParam Long savedDocument) {
+        documentService.userUnsavedDocument(username, savedDocument);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -156,9 +155,9 @@ public class DocumentController {
     }
 
     @PatchMapping("/{documentId}/visibility")
-    public ResponseEntity<DocumentDTO> changeVisibility(@PathVariable long documentId, Authentication authentication){
+    public ResponseEntity<DocumentDTO> changeVisibility(@PathVariable long documentId, Authentication authentication) {
 
-        if (loggedUserProvider.getCurrentUser().getId().equals(documentRepository.findById(documentId).get().getCreator().getId())){
+        if (loggedUserProvider.getCurrentUser().getId().equals(documentRepository.findById(documentId).get().getCreator().getId())) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -170,11 +169,9 @@ public class DocumentController {
             @RequestParam("genres") List<String> genres,
             @RequestParam("page") int page,
             @RequestParam("pageSize") int pageSize,
-            @RequestParam("tittleFragment") String tittleFragment){
+            @RequestParam("tittleFragment") String tittleFragment) {
 
-        System.out.println("Recibiendo petición controlador");
-
-        Iterable<Document> documents = documentService.getDocumentsByGenres(genres,tittleFragment,page,pageSize);
+        Iterable<Document> documents = documentService.getDocumentsByGenres(genres, tittleFragment, page, pageSize);
 
         Collection<Document> documentCollection = new ArrayList<>();
 

@@ -2,6 +2,8 @@ package com.marco.appEscritura.service;
 
 import com.marco.appEscritura.dto.UserDTO;
 import com.marco.appEscritura.entity.User;
+import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
+import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +27,19 @@ public class UserService {
     @Autowired
     private ActivityService activityService;
 
-    public Optional<User> getById(UUID id) {
-        return userRepository.findById(id);
+    public User getById(UUID id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (!userOptional.isPresent()) {
+            throw new NotExistingUser("User with uuid: " + id + " does not exist" );
+        }
+        return userOptional.get();
     }
 
     public User getByUsername(String username) {
         Optional<User> user = userRepository.findOneByUsername(username);
         if (!user.isPresent()) {
-            //excepcion
+            throw new NotExistingUser("User with username: " + username + " does not exist" );
         }
-
         return user.get();
     }
 
@@ -47,6 +52,10 @@ public class UserService {
     }
 
     public List<User> getRecommendationFor(String username){
+        Optional<User> user = userRepository.findOneByUsername(username);
+        if (!user.isPresent()) {
+            throw new NotExistingUser("User with username: " + username + " does not exist" );
+        }
         return userRepository.findRandomUsersFromFollowers(username);
     }
 
@@ -54,7 +63,7 @@ public class UserService {
         Optional<User> userOptional = userRepository.findById(id);
 
         if (!userOptional.isPresent()) {
-            //excepcion
+            throw new NotExistingUser("User with uuid: " + id + " does not exist" );
         }
 
         User user = userOptional.get();
@@ -80,6 +89,10 @@ public class UserService {
     }
 
     public User save(User user) {
+        Optional<User> userOptional = userRepository.findOneByUsername(user.getUsername());
+        if(userOptional.isPresent()){
+            throw new AlreadyExistingUser("User with username: " + user.getUsername() + " does already exist");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -89,11 +102,16 @@ public class UserService {
     }
 
     public void updateFollowers(String username, String follower) {
+
         Optional<User> followingUserOptional = userRepository.findOneByUsername(username);
+
         Optional<User> followerUserOptional = userRepository.findOneByUsername(follower);
 
-        if (!followingUserOptional.isPresent() || !followerUserOptional.isPresent()) {
-            //excepcion
+        if (!followingUserOptional.isPresent()) {
+            throw new NotExistingUser("User with username: " + username + " does not exist");
+        }
+        if (!followerUserOptional.isPresent()) {
+            throw new NotExistingUser("User with username: " + follower + " does not exist");
         }
 
         User followingUser = followingUserOptional.get();
@@ -115,7 +133,7 @@ public class UserService {
     public List<User> getFollowersOf(String username){
         Optional<User> userOptional = userRepository.findOneByUsername(username);
         if(!userOptional.isPresent()){
-            //Excepcion
+            throw new NotExistingUser("User with username: " + username + " does not exist");
         }
         return userOptional.get().getFollowers();
 
@@ -124,7 +142,7 @@ public class UserService {
     public List<User> getFollowingOf(String username){
         Optional<User> userOptional = userRepository.findOneByUsername(username);
         if(!userOptional.isPresent()){
-            //Excepcion
+            throw new NotExistingUser("User with username: " + username + " does not exist");
         }
         return userOptional.get().getFollowing();
     }
