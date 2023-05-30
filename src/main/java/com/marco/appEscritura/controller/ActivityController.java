@@ -19,7 +19,6 @@ public class ActivityController {
 
     @GetMapping("/recent")
     public ResponseEntity<List<ActivityEvent>> getRecentActivity(@RequestParam int pageSize, @RequestParam int pageNumber, @RequestParam List<String> usernames) {
-        System.out.println("PIDIENDO ACTIVIDAD");
         List<ActivityEvent> activity = activityService.getRecentActivity(pageSize, pageNumber, usernames);
         return ResponseEntity.ok(activity);
     }

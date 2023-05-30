@@ -155,45 +155,40 @@ public class AppEscrituraApplication implements CommandLineRunner {
             document.setSynopsis("Sinopsis de prueba, esto debería de aparecer correctamente en el documento");
             document.setCover("data:image/png;base64," + imageUrls.get(i - 1));
 
-            // Determina si el documento es público o privado
-            int userDocumentCount = (i % 3 == 0) ? 3 : i % 3; // Esto da 1, 2, 3 para cada grupo de 3 documentos
+
+            int userDocumentCount = (i % 3 == 0) ? 3 : i % 3;
             if (userDocumentCount == 3) {
-                document.setPublic(false); // Suponiendo que esta es la función para hacerlo privado
+                document.setPublic(false);
             } else {
-                document.setPublic(true); // Suponiendo que esta es la función para hacerlo público
+                document.setPublic(true);
             }
 
             documents.add(documentService.getDocument(documentService.createDocument(document.toDto())));
             document.setBeingRead(Collections.EMPTY_LIST);
         }
 
-        // Crear comentarios, reseñas, respuestas y lecturas
         for (int i = 0; i < users.size(); i++) {
             for (int j = 0; j < documents.size(); j++) {
 
-                // Crear reseña
+                if (documents.get(j).isPublic()) {
+                    int randomReview = random.nextInt(5) + 1;
 
-                int randomReview = random.nextInt(5) + 1;
+                    Review review = new Review("Reseña " + (i * documents.size() + j + 1), users.get(i), documents.get(j), randomReview);
 
-                Review review = new Review("Reseña " + (i * documents.size() + j + 1), users.get(i), documents.get(j), randomReview);
+                    CommentDTO reviewDto = review.toDto();
+                    reviewDto.setCommentType(CommentType.REVIEW);
 
-                CommentDTO reviewDto = review.toDto();
-                reviewDto.setCommentType(CommentType.REVIEW);
+                    Long reviewID = commentService.saveComment(reviewDto).getId();
 
-                Long reviewID = commentService.saveComment(reviewDto).getId();
+                    review.setId(reviewID);
 
-                review.setId(reviewID);
+                    Response response = new Response("Respuesta " + (i * documents.size() + j + 1), users.get(i), documents.get(j), review);
 
-                // Crear respuesta
-                Response response = new Response("Respuesta " + (i * documents.size() + j + 1), users.get(i), documents.get(j), review);
+                    CommentDTO responseDto = response.toDto();
+                    responseDto.setCommentType(CommentType.RESPONSE);
 
-                CommentDTO responseDto = response.toDto();
-                responseDto.setCommentType(CommentType.RESPONSE);
+                    commentService.saveComment(responseDto);
 
-                commentService.saveComment(responseDto);
-
-
-                if(documents.get(j).isPublic()) {
                     Reading reading = new Reading(users.get(i), documents.get(j), (float) (j + 1) / 10);
                     readingService.createReading(reading.toDto());
                 }

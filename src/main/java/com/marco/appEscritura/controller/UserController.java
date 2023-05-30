@@ -9,6 +9,7 @@ import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    public UserDTO getUserByUsername(@PathVariable String username){
-        return userService.getByUsername(username).toDto();
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username){
+        return ResponseEntity.ok(userService.getByUsername(username).toDto());
     }
 
     @GetMapping("/exists/{username}")
@@ -45,6 +46,7 @@ public class UserController {
     }
 
     @GetMapping("/recommendations/{username}")
+    @PreAuthorize("authentication.principal.getUsername() == #username")
     public  ResponseEntity<List<UserDTO>> getRecommendationsFor(@PathVariable String username){
         return ResponseEntity.status(HttpStatus.OK).body(userService.getRecommendationFor(username).stream()
                 .map(user -> user.toDto())
@@ -52,11 +54,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("authentication.principal.username == @userService.getUser(#id)?.getUsername()")
     public ResponseEntity<Void> updateUser(@PathVariable UUID id, @RequestBody UserDTO userDTO){
         userService.updateUser(id,userDTO);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     @PatchMapping("/{username}/followers/{follower}")
+    @PreAuthorize("authentication.principal.getUsername() == #username")
     public ResponseEntity<Void> updateFollowers(@PathVariable String username, @PathVariable String follower){
         userService.updateFollowers(username,follower);
         return ResponseEntity.status(HttpStatus.OK).build();

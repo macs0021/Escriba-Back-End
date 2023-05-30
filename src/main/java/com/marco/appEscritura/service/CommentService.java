@@ -42,7 +42,7 @@ public class CommentService {
                 Optional<Review> reviewOptional =
                         reviewRepository.findReviewByPostedIn_IdAndPostedBy_Username(commentDTO.getPostedIn(), commentDTO.getPostedBy());
 
-                if(reviewOptional.isPresent()){
+                if (reviewOptional.isPresent()) {
                     throw new AlreadyExistingReview("Review by " + commentDTO.getPostedBy() + " in " + commentDTO.getPostedIn() + " does already exist");
                 }
 
@@ -62,11 +62,12 @@ public class CommentService {
 
                 response.setReview(reviewResponse);
 
+                Response finalResponse = responseRepository.save(response);
+
+                reviewResponse.getResponses().add(finalResponse);
                 reviewRepository.save(reviewResponse);
 
-                 Response finalResponse = responseRepository.save(response);
-
-                activityService.replyToReviewEvent(response.getPostedBy().getUsername(), finalResponse.getId());
+                activityService.replyToReviewEvent(finalResponse.getPostedBy().getUsername(), finalResponse.getId());
 
                 return finalResponse;
             case INLINE:
@@ -75,11 +76,21 @@ public class CommentService {
         return null;
     }
 
+    public Comment getCommentByID(Long commentID) {
+        Optional<Comment> commentOptional = commentRepository.findById(commentID);
+
+        if (!commentOptional.isPresent()) {
+            throw new NotExistingComment("Comment with id: " + commentID + " does not exist");
+        }
+
+        return commentOptional.get();
+    }
+
     public Review getReviewByID(Long reviewID) {
         Optional<Comment> reviewOptional = reviewRepository.findById(reviewID);
 
         if (!reviewOptional.isPresent()) {
-            throw new NotExistingComment("Review with id: "+ reviewID + " does not exist");
+            throw new NotExistingComment("Review with id: " + reviewID + " does not exist");
         }
 
         return (Review) reviewOptional.get();
@@ -89,7 +100,7 @@ public class CommentService {
         Optional<Comment> responseOptional = responseRepository.findById(responseID);
 
         if (!responseOptional.isPresent()) {
-            throw new NotExistingComment("Reply with id: "+ responseID + " does not exist");
+            throw new NotExistingComment("Reply with id: " + responseID + " does not exist");
         }
         return (Response) responseOptional.get();
     }
@@ -98,7 +109,7 @@ public class CommentService {
         Optional<Comment> optionalReview = reviewRepository.findById(reviewId);
 
         if (!optionalReview.isPresent()) {
-            throw new NotExistingComment("Review with id: "+ reviewId + " does not exist");
+            throw new NotExistingComment("Review with id: " + reviewId + " does not exist");
         }
 
         Review review = (Review) optionalReview.get();
@@ -112,14 +123,16 @@ public class CommentService {
 
     public void deleteComment(Long commentId) {
         Optional<Comment> optionalComment = commentRepository.findById(commentId);
-        if(!optionalComment.isPresent()) throw new NotExistingComment("Comment with id: " + commentId + " does not exist");
+        if (!optionalComment.isPresent())
+            throw new NotExistingComment("Comment with id: " + commentId + " does not exist");
         commentRepository.deleteById(commentId);
     }
 
     public Long updateComment(Long commentId, CommentDTO commentDTO) {
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
 
-        if(!commentOptional.isPresent()) throw new NotExistingComment("Comment with id: " + commentId + " does not exist");
+        if (!commentOptional.isPresent())
+            throw new NotExistingComment("Comment with id: " + commentId + " does not exist");
 
         switch (commentDTO.getCommentType()) {
             case REVIEW:
