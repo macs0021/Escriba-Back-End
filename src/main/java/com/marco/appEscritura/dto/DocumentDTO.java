@@ -1,12 +1,14 @@
 package com.marco.appEscritura.dto;
 
 import com.marco.appEscritura.entity.Document;
+import com.marco.appEscritura.entity.Genre;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 public class DocumentDTO {
@@ -37,14 +39,14 @@ public class DocumentDTO {
         this.rating = 0;
     }
 
-    public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<String> genres, List<String> savedBy, List<ReadingDTO> readings, boolean isPublic, int rating) {
+    public DocumentDTO(long id, String tittle, String cover, String privateText, String creatorUsername, String synopsis, List<Genre> genres, List<String> savedBy, List<ReadingDTO> readings, boolean isPublic, int rating) {
         this.id = id;
         this.tittle = tittle;
         this.cover = cover;
         this.text = privateText;
         this.creatorUsername = creatorUsername;
         this.synopsis = synopsis;
-        this.genres = genres;
+        this.genres = genres.stream().map(Genre::getGenre).collect(Collectors.toList());
         this.savedBy = savedBy;
         this.readings = readings;
         this.isPublic = isPublic;

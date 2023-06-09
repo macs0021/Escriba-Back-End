@@ -2,9 +2,15 @@ package com.marco.appEscritura.controller;
 
 import com.marco.appEscritura.dto.ReadingDTO;
 import com.marco.appEscritura.entity.Reading;
+import com.marco.appEscritura.exceptions.Document.NotExistingDocument;
+import com.marco.appEscritura.exceptions.Reading.AlreadyExistingReading;
+import com.marco.appEscritura.exceptions.Reading.NotExistingReading;
+import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
+import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.repository.ReadingRepository;
 import com.marco.appEscritura.service.ReadingService;
 import jakarta.websocket.server.PathParam;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +27,25 @@ public class ReadingController {
 
     @Autowired
     ReadingService readingService;
+
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handlerRestrictions(ConstraintViolationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler({NotExistingReading.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<String> NotExistingExceptionHandler(RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler({AlreadyExistingReading.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<String> AlreadyExistingExceptionHandler(RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 
     @PostMapping
     @PreAuthorize("authentication.principal.getUsername() == #readingDto.getUsername()")

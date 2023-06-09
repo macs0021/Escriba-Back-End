@@ -20,11 +20,8 @@ public class Document implements Serializable {
     private long id;
     @Column(columnDefinition = "TEXT", length = 10000)
     String text;
-
     String tittle;
-
     boolean isPublic;
-
     @Lob
     @Column(columnDefinition = "TEXT")
     String synopsis;
@@ -32,12 +29,8 @@ public class Document implements Serializable {
     @Lob
     @Column(columnDefinition = "TEXT")
     String cover;
-    @ElementCollection
-    @CollectionTable(name = "document_genres", joinColumns = @JoinColumn(name = "document_id"))
-    @Column(name = "genre")
-    List<String> genres;
-
-    List<String> tags;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    List<Genre> genres;
 
     int rating;
 
@@ -46,7 +39,7 @@ public class Document implements Serializable {
 
     @OneToMany(mappedBy = "postedIn", cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    List<Review> reviews;
+    List<Comment> reviews;
     @ManyToOne
     User creator;
 
@@ -61,7 +54,6 @@ public class Document implements Serializable {
         savedBy = new ArrayList<>();
         reviews = new ArrayList<>();
         genres = new ArrayList<>();
-        tags = new ArrayList<>();
         isPublic = false;
         rating = 0;
         beingRead = Collections.EMPTY_LIST;
@@ -70,6 +62,7 @@ public class Document implements Serializable {
     public DocumentDTO toDto() {
         List<String> savedUsersUUID = savedBy.stream().map(user -> user.username).collect(Collectors.toList());
         List<ReadingDTO> readingsDto = beingRead.stream().map(reading -> reading.toDto()).collect(Collectors.toList());
+        System.out.println("MOSTRANDO EL PRIMERO: " + genres.get(0).getGenre());
         return new DocumentDTO(id, tittle, cover, text, creator.getUsername(), synopsis, genres, savedUsersUUID, readingsDto,isPublic,rating);
     }
 }

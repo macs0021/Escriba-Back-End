@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -118,7 +119,14 @@ public class CommentService {
 
     public List<Review> getReviewsOfDocument(Long documentId) {
         Document document = documentService.getDocument(documentId);
-        return document.getReviews();
+        List<Comment> comments = document.getReviews();
+
+        List<Review> reviews = comments.stream()
+                .filter(Review.class::isInstance)
+                .map(Review.class::cast)
+                .collect(Collectors.toList());
+
+        return reviews;
     }
 
     public void deleteComment(Long commentId) {

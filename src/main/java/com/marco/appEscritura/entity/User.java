@@ -33,7 +33,6 @@ public class User {
     @Lob
     @Column(columnDefinition = "TEXT")
     String description;
-
     @OneToMany(mappedBy = "creator")
     List<Document> created;
     @ManyToMany

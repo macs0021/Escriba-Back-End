@@ -4,11 +4,16 @@ import com.marco.appEscritura.dto.DocumentDTO;
 import com.marco.appEscritura.entity.Document;
 import com.marco.appEscritura.entity.Response;
 import com.marco.appEscritura.entity.User;
+import com.marco.appEscritura.exceptions.Document.AlreadyExistingDocument;
+import com.marco.appEscritura.exceptions.Document.NotExistingDocument;
+import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
+import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.repository.DocumentRepository;
 import com.marco.appEscritura.repository.UserRepository;
 import com.marco.appEscritura.security.LoggedUserProvider;
 import com.marco.appEscritura.service.DocumentService;
 import io.swagger.v3.oas.annotations.Operation;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +54,24 @@ public class DocumentController {
                 .map(document -> document.toDto())
                 .collect(Collectors.toList()));
     }*/
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handlerRestrictions(ConstraintViolationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler({NotExistingDocument.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<String> NotExistingExceptionHandler(RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler({AlreadyExistingDocument.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<String> AlreadyExistingExceptionHandler(RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 
     @GetMapping("/checkOwner/{documentId}")
     public ResponseEntity<Boolean> checkOwner(@PathVariable long documentId) {

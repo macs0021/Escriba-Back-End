@@ -2,6 +2,7 @@ package com.marco.appEscritura.service;
 
 import com.marco.appEscritura.dto.DocumentDTO;
 import com.marco.appEscritura.entity.Document;
+import com.marco.appEscritura.entity.Genre;
 import com.marco.appEscritura.entity.Reading;
 import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.exceptions.Document.NotExistingDocument;
@@ -30,6 +31,9 @@ public class DocumentService {
     @Autowired
     ActivityService activityService;
 
+    @Autowired
+    GenreService genreService;
+
     public Document getDocument(Long id) {
         Optional<Document> documentOptional = documentRepository.findById(id);
         if (!documentOptional.isPresent()) {
@@ -51,6 +55,10 @@ public class DocumentService {
         Document savedDocument = documentRepository.save(document);
 
         userRepository.save(user);
+
+        for (Genre genre : savedDocument.getGenres()) {
+            genreService.addDocumentToGenre(genre.getGenre(), savedDocument);
+        }
 
         activityService.createDocumentCreationEvent(user.getUsername(), savedDocument.getId());
         return savedDocument.getId();
@@ -117,12 +125,26 @@ public class DocumentService {
         Document document = documentOptional.get();
 
         document.setText(documentDto.getText());
-        document.setGenres(documentDto.getGenres());
+
+        for (Genre genre : document.getGenres()) {
+            genreService.removeDocumentToGenre(genre.getGenre(), document);
+        }
+
+        document.setGenres(documentDto.getGenres().stream()
+                .map(genreName -> genreService.findByGenre(genreName))
+                .collect(Collectors.toList()));
+
         document.setTittle(documentDto.getTittle());
         document.setCover(documentDto.getCover());
         document.setSynopsis(documentDto.getSynopsis());
 
-        return documentRepository.save(document);
+        Document savedDocument = documentRepository.save(document);
+
+        for (Genre genre : savedDocument.getGenres()) {
+            genreService.addDocumentToGenre(genre.getGenre(), savedDocument);
+        }
+
+        return savedDocument;
     }
 
     public Iterable<Document> getDocumentsCreatedBy(String username) {
@@ -207,10 +229,15 @@ public class DocumentService {
     public Iterable<Document> getDocumentsByGenres(List<String> genres, String tittleFragment, int page, int pageSize) {
 
         int offset = page * pageSize;
+        List<Document> documents;
 
-        List<Document> documents = documentRepository.findAllByGenresAndTittleFragment(genres, tittleFragment, pageSize, offset, genres.size());
-
-        return documents;
+        if(!genres.isEmpty())
+            documents = genreService.findDocumentsByGenreName(genres,tittleFragment);
+        else
+            documents = documentRepository.findPublicDocumentsByTittleFragment(tittleFragment);
+        
+        int endIndex = Math.min(offset + pageSize, documents.size());
+        return documents.subList(offset, endIndex);
 
     }
 
@@ -285,7 +312,10 @@ public class DocumentService {
         document.setCover(documentDto.getCover());
         document.setCreator(user.get());
 
-        document.setGenres(documentDto.getGenres());
+         document.setGenres(documentDto.getGenres().stream()
+                .map(genreName -> genreService.findByGenre(genreName))
+                .collect(Collectors.toList()));
+
         document.setRating(documentDto.getRating());
         List<Reading> readingList = documentDto.getReadings().stream()
                 .map(readingDTO -> readingService.DtoToReading(readingDTO))

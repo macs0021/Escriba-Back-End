@@ -3,7 +3,9 @@ package com.marco.appEscritura.controller;
 import com.marco.appEscritura.entity.ActivityEvent;
 import com.marco.appEscritura.service.ActivityService;
 import jakarta.validation.constraints.AssertTrue;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,12 @@ public class ActivityController {
 
     @Autowired
     private ActivityService activityService;
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handlerRestrictions(ConstraintViolationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 
     @GetMapping("/recent")
     public ResponseEntity<List<ActivityEvent>> getRecentActivity(@RequestParam int pageSize, @RequestParam int pageNumber, @RequestParam List<String> usernames) {

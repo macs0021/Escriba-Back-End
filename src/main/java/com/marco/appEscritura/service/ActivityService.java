@@ -2,6 +2,7 @@ package com.marco.appEscritura.service;
 
 import com.marco.appEscritura.Utils.EntityType;
 import com.marco.appEscritura.entity.ActivityEvent;
+import com.marco.appEscritura.exceptions.Activity.NotExistingActivity;
 import com.marco.appEscritura.repository.ActivityEventRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -82,4 +84,16 @@ public class ActivityService {
         activityEventRepository.save(activityEvent);
 
     }
+    public void deleteActivityEvent(long activityID){
+        Optional<ActivityEvent> activityEventOptional = activityEventRepository.findById(activityID);
+
+        if(!activityEventOptional.isPresent()) throw new NotExistingActivity("The activity with id: " + activityID + " does not exist");
+
+        activityEventRepository.deleteById(activityID);
+    }
+
+    public boolean checkIfExist(String entityID, EntityType entityType){
+        return activityEventRepository.existsByEntityIdAndEntityType(entityID, entityType);
+    }
+
 }

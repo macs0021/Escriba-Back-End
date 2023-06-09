@@ -3,10 +3,7 @@ package com.marco.appEscritura;
 import com.marco.appEscritura.Utils.CommentType;
 import com.marco.appEscritura.dto.CommentDTO;
 import com.marco.appEscritura.entity.*;
-import com.marco.appEscritura.service.CommentService;
-import com.marco.appEscritura.service.DocumentService;
-import com.marco.appEscritura.service.ReadingService;
-import com.marco.appEscritura.service.UserService;
+import com.marco.appEscritura.service.*;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +39,8 @@ public class AppEscrituraApplication implements CommandLineRunner {
     @Autowired
     private ReadingService readingService;
 
+    @Autowired
+    private GenreService genreService;
 
     public static void main(String[] args) {
         SpringApplication.run(AppEscrituraApplication.class, args);
@@ -133,18 +132,26 @@ public class AppEscrituraApplication implements CommandLineRunner {
                 "Journalism and Essays"
         );
 
+        List<Genre> entityGenres = new ArrayList<>();
+
+        for(int i = 0; i < genres.size(); i++){
+            Genre auxGenre = genreService.create(genres.get(i));
+            entityGenres.add(auxGenre);
+        }
+
         int documentCount = userCount * 3;
         List<Document> documents = new ArrayList<>();
         Random random = new Random();
         for (int i = 1; i <= documentCount; i++) {
-            int numGenres = random.nextInt(3) + 2; // Genera un número aleatorio entre 2 y 4
+            int numGenres = random.nextInt(3) + 2; // Generates a random number between 2 and 4
             Document document = new Document();
 
-            List<String> documentGenres = new ArrayList<>();
+            List<Genre> documentGenres = new ArrayList<>();
             for (int k = 0; k < numGenres; k++) {
                 int randomIndex = random.nextInt(genres.size());
-                String genre = genres.get(randomIndex);
+                Genre genre = entityGenres.get(randomIndex);
                 documentGenres.add(genre);
+                genre.getDocumentsOfGenre().add(document); // Assure the document is also added to the genre
             }
 
             document.setGenres(documentGenres);
@@ -155,7 +162,6 @@ public class AppEscrituraApplication implements CommandLineRunner {
             document.setSynopsis("Sinopsis de prueba, esto debería de aparecer correctamente en el documento");
             document.setCover("data:image/png;base64," + imageUrls.get(i - 1));
 
-
             int userDocumentCount = (i % 3 == 0) ? 3 : i % 3;
             if (userDocumentCount == 3) {
                 document.setPublic(false);
@@ -163,8 +169,20 @@ public class AppEscrituraApplication implements CommandLineRunner {
                 document.setPublic(true);
             }
 
-            documents.add(documentService.getDocument(documentService.createDocument(document.toDto())));
+            Long documentID = documentService.createDocument(document.toDto());
+            documents.add(documentService.getDocument(documentID));
             document.setBeingRead(Collections.EMPTY_LIST);
+
+            // Save genres to persist changes
+            for (Genre genre : documentGenres) {
+                genreService.update(genre.getGenre());
+            }
+        }
+
+        for (Document docu : documents) {
+            for (Genre genre : docu.getGenres()) {
+                System.out.println(genre.getGenre());
+            }
         }
 
         for (int i = 0; i < users.size(); i++) {
