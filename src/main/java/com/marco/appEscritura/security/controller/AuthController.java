@@ -6,6 +6,7 @@ import com.marco.appEscritura.security.dto.LoginDto;
 import com.marco.appEscritura.security.dto.RegisterDto;
 import com.marco.appEscritura.security.token.JwtProvider;
 import com.marco.appEscritura.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,7 @@ public class AuthController {
     @Autowired
     JwtProvider jwtProvider;
 
+    @Operation(summary = "Registrar usuario", description = "Registra a un usuario en la aplicación")
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterDto newUser){
 
@@ -55,6 +57,7 @@ public class AuthController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Iniciar sesión", description = "Inicia la sesión de un usuario en la aplicación")
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDto loggedUser){
 
@@ -72,6 +75,7 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Refresco de token", description = "Refresca un token válido que haya cadudado")
     @PostMapping("/refresh")
     public ResponseEntity<JwtDto> refresh(@RequestBody JwtDto jwtDto) throws ParseException {
         String token = jwtProvider.refreshToken(jwtDto);

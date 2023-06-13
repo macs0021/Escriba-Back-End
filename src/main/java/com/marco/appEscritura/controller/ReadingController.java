@@ -28,7 +28,6 @@ public class ReadingController {
     @Autowired
     ReadingService readingService;
 
-
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerRestrictions(ConstraintViolationException e) {

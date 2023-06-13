@@ -235,7 +235,7 @@ public class DocumentService {
             documents = genreService.findDocumentsByGenreName(genres,tittleFragment);
         else
             documents = documentRepository.findPublicDocumentsByTittleFragment(tittleFragment);
-        
+
         int endIndex = Math.min(offset + pageSize, documents.size());
         return documents.subList(offset, endIndex);
 
