@@ -9,6 +9,7 @@ import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
 import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.repository.ReadingRepository;
 import com.marco.appEscritura.service.ReadingService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.websocket.server.PathParam;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class ReadingController {
     @Autowired
     ReadingService readingService;
 
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerRestrictions(ConstraintViolationException e) {
@@ -46,6 +48,7 @@ public class ReadingController {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
+    @Operation(summary = "Crear lectura", description = "Crea una lectura.")
     @PostMapping
     @PreAuthorize("authentication.principal.getUsername() == #readingDto.getUsername()")
     public ResponseEntity<Void> createReading(@RequestBody ReadingDTO readingDto) {
@@ -53,6 +56,7 @@ public class ReadingController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Obtener lectura", description = "Devuelve la lectura de un usuario en un documento.")
     @GetMapping("/get/{username}/{documentID}")
     @PreAuthorize("authentication.principal.getUsername() == #username")
     public ResponseEntity<ReadingDTO> getReading(@PathVariable String username, @PathVariable Long documentID) {
@@ -60,12 +64,14 @@ public class ReadingController {
         return ResponseEntity.status(HttpStatus.OK).body(reading.toDto());
     }
 
+    @Operation(summary = "Comprobar existencia lectura", description = "Comprueba que un usuario está leyendo un documento.")
     @GetMapping("/check/{username}/{documentID}")
     @PreAuthorize("authentication.principal.getUsername() == #username")
     public ResponseEntity<Boolean> checkReading(@PathVariable String username, @PathVariable Long documentID) {
         return ResponseEntity.status(HttpStatus.OK).body(readingService.checkReading(username,documentID));
     }
 
+    @Operation(summary = "Actualiza lectura", description = "Actualiza el valor de una lectura.")
     @PutMapping
     @PreAuthorize("authentication.principal.getUsername() == #readingDto.getUsername()")
     public ResponseEntity<Void> modifyReading(@RequestBody ReadingDTO readingDto) {

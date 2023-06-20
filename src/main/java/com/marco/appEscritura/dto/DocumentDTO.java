@@ -12,21 +12,16 @@ import java.util.stream.Collectors;
 
 @Data
 public class DocumentDTO {
-
     long id;
     String tittle;
     String cover;
     String text;
-
     boolean isPublic;
     String creatorUsername;
     String synopsis;
     List<String> genres;
-
     List<String> savedBy;
-
     List<ReadingDTO> readings;
-
     int rating;
 
     public DocumentDTO() {

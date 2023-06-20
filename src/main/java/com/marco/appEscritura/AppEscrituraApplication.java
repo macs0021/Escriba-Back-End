@@ -143,7 +143,7 @@ public class AppEscrituraApplication implements CommandLineRunner {
         List<Document> documents = new ArrayList<>();
         Random random = new Random();
         for (int i = 1; i <= documentCount; i++) {
-            int numGenres = random.nextInt(3) + 2; // Generates a random number between 2 and 4
+            int numGenres = random.nextInt(3) + 2;
             Document document = new Document();
 
             List<Genre> documentGenres = new ArrayList<>();
@@ -151,14 +151,14 @@ public class AppEscrituraApplication implements CommandLineRunner {
                 int randomIndex = random.nextInt(genres.size());
                 Genre genre = entityGenres.get(randomIndex);
                 documentGenres.add(genre);
-                genre.getDocumentsOfGenre().add(document); // Assure the document is also added to the genre
+                genre.getDocumentsOfGenre().add(document);
             }
 
             document.setGenres(documentGenres);
             document.setTittle("Documento " + i);
             document.setCreator(users.get((i - 1) / 3));
             document.setText("Texto del documento " + i);
-            document.setRating(i);
+            document.setRating(i%5);
             document.setSynopsis("Sinopsis de prueba, esto debería de aparecer correctamente en el documento");
             document.setCover("data:image/png;base64," + imageUrls.get(i - 1));
 

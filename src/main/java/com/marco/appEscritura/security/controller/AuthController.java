@@ -45,12 +45,9 @@ public class AuthController {
 
         if(userService.existsByUsername(newUser.getUsername()))
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        //if(userService.existsByEmail(newUser.getEmail()))
-            //return new ResponseEntity(HttpStatus.BAD_REQUEST);
 
         User user = new User(newUser.getUsername(),
                         newUser.getPassword(),newUser.getEmail());
-        System.out.println("Imagen de perfil por defecto: " + newUser.getProfileImage() );
         user.setImage(newUser.getProfileImage());
 
         userService.save(user);

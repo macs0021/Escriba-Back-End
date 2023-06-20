@@ -13,6 +13,11 @@ import com.marco.appEscritura.repository.UserRepository;
 import com.marco.appEscritura.security.LoggedUserProvider;
 import com.marco.appEscritura.service.DocumentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,14 +38,7 @@ import java.util.stream.Collectors;
 public class DocumentController {
 
     @Autowired
-    private DocumentService documentService;
-    @Autowired
-    private DocumentRepository documentRepository;
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private LoggedUserProvider loggedUserProvider;
+    DocumentService documentService;
 
     /*@GetMapping("/all")
     public ResponseEntity<Iterable<DocumentDTO>> getAllDocuments(@RequestParam("page") int page,
@@ -96,9 +94,9 @@ public class DocumentController {
     @GetMapping("/{id}")
     @Operation(summary = "Obtener documento mediante ID",
             description = "Devuelve la información del documento solicitado")
+
     @PreAuthorize("@documentService.checkOwner(authentication.principal.getUsername(), #id) || @documentService.checkPublic(#id)")
     public ResponseEntity<DocumentDTO> getDocument(@PathVariable long id) {
-
         DocumentDTO document = documentService.getDocument(id).toDto();
         return ResponseEntity.ok(document);
     }
@@ -224,6 +222,10 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     @Operation(summary = "Cambiar visibilidad", description = "El propietario del documento puede cambiar su visibilidad.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Visibilidad cambiada correctamente"),
+            @ApiResponse(responseCode = "404", description = "Documento no encontrado")
+    })
     @PatchMapping("/{documentId}/visibility")
     @PreAuthorize("@documentService.checkOwner(authentication.principal.getUsername(), #documentId)")
     public ResponseEntity<DocumentDTO> changeVisibility(@PathVariable long documentId) {
@@ -231,8 +233,12 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.OK).body(documentService.changeVisibility(documentId).toDto());
     }
     @Operation(summary = "Obtener documentos por género y página", description = "Obtiene los documentos públicos basados en los géneros proporcionados y el fragmento del título.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Documentos devueltos correctamente", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DocumentDTO.class)))),
+            @ApiResponse(responseCode = "404", description = "Genero no encontrado", content = @Content(schema = @Schema(implementation = Void.class)))
+    })
     @GetMapping("/genres")
-    public ResponseEntity<Iterable<DocumentDTO>> getDocumentsByGenreAndPage(
+    public ResponseEntity<List<DocumentDTO>> getDocumentsByGenreAndPage(
             @RequestParam("genres") List<String> genres,
             @RequestParam("page") int page,
             @RequestParam("pageSize") int pageSize,
