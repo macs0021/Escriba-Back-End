@@ -1,9 +1,9 @@
-package com.marco.appEscritura.security.controller;
+package com.marco.appEscritura.controller;
 
 import com.marco.appEscritura.entity.User;
-import com.marco.appEscritura.security.dto.JwtDto;
-import com.marco.appEscritura.security.dto.LoginDto;
-import com.marco.appEscritura.security.dto.RegisterDto;
+import com.marco.appEscritura.dto.JwtDto;
+import com.marco.appEscritura.dto.LoginDto;
+import com.marco.appEscritura.dto.RegisterDto;
 import com.marco.appEscritura.security.token.JwtProvider;
 import com.marco.appEscritura.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,7 +1,7 @@
 package com.marco.appEscritura.security.token;
 
 import com.marco.appEscritura.security.details.UserDetailsImpl;
-import com.marco.appEscritura.security.dto.JwtDto;
+import com.marco.appEscritura.dto.JwtDto;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
@@ -13,14 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtProvider {

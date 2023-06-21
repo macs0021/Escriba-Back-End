@@ -1,4 +1,4 @@
-package com.marco.appEscritura.security.dto;
+package com.marco.appEscritura.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

@@ -10,7 +10,6 @@ import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
 import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.repository.DocumentRepository;
 import com.marco.appEscritura.repository.UserRepository;
-import com.marco.appEscritura.security.LoggedUserProvider;
 import com.marco.appEscritura.service.DocumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
