@@ -10,6 +10,7 @@ import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
 import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.service.CommentService;
 import com.marco.appEscritura.service.DocumentService;
+import io.jsonwebtoken.MalformedJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,11 @@ public class CommentController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerRestrictions(ConstraintViolationException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<String> handleMalformedJwtException(MalformedJwtException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token.");
     }
 
     @ExceptionHandler({NotExistingComment.class})

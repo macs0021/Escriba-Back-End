@@ -126,9 +126,18 @@ public class ReadingService {
     }
 
     public Reading DtoToReading(ReadingDTO readingDTO) {
-        User user = userRepository.findOneByUsername(readingDTO.getUsername()).get();
-        Document document = documentRepository.findById(readingDTO.getDocument()).get();
-        return new Reading(user, document, readingDTO.getReadingSpot());
+        Optional<User> userOptional = userRepository.findOneByUsername(readingDTO.getUsername());
+
+        if(!userOptional.isPresent()){
+            throw new NotExistingUser("User on reading does not exist");
+        }
+
+        Optional<Document> documentOptional = documentRepository.findById(readingDTO.getDocument());
+
+        if(!documentOptional.isPresent()){
+            throw new NotExistingDocument("Document on reading does not exist");
+        }
+        return new Reading(userOptional.get(), documentOptional.get(), readingDTO.getReadingSpot());
     }
 
 }

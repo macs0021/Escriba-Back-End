@@ -2,6 +2,7 @@ package com.marco.appEscritura.controller;
 
 import com.marco.appEscritura.entity.ActivityEvent;
 import com.marco.appEscritura.service.ActivityService;
+import io.jsonwebtoken.MalformedJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.exception.ConstraintViolationException;
@@ -20,6 +21,10 @@ public class ActivityController {
     @Autowired
     private ActivityService activityService;
 
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<String> handleMalformedJwtException(MalformedJwtException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token.");
+    }
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerRestrictions(ConstraintViolationException e) {

@@ -8,6 +8,7 @@ import com.marco.appEscritura.exceptions.Document.NotExistingDocument;
 import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
 import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.service.UserService;
+import io.jsonwebtoken.MalformedJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.coyote.Response;
 import org.hibernate.exception.ConstraintViolationException;
@@ -40,12 +41,10 @@ public class UserController {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler({AlreadyExistingUser.class})
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<String> AlreadyExistingExceptionHandler(RuntimeException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<String> handleMalformedJwtException(MalformedJwtException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token.");
     }
-
     @Operation(summary = "Obtener usuarios", description = "Retorna una lista con todos los usuarios.")
     @GetMapping
     public List<User> getUsers(){
@@ -71,7 +70,7 @@ public class UserController {
                 .map(user -> user.toDto())
                 .collect(Collectors.toList()));
     }
-
+    
     @Operation(summary = "Obtener recomendaciones para un usuario", description = "Devuelve una lista de recomendaciones para el usuario especificado por su nombre de usuario.")
     @GetMapping("/recommendations/{username}")
     @PreAuthorize("authentication.principal.getUsername() == #username")
@@ -83,7 +82,7 @@ public class UserController {
 
     @Operation(summary = "Actualizar usuario", description = "Actualiza la información de un usuario específico.")
     @PutMapping("/{id}")
-    @PreAuthorize("authentication.principal.username == @userService.getUser(#id)?.getUsername()")
+    @PreAuthorize("authentication.principal.username == @userService.getById(#id)?.getUsername()")
     public ResponseEntity<Void> updateUser(@PathVariable UUID id, @RequestBody UserDTO userDTO){
         userService.updateUser(id,userDTO);
         return ResponseEntity.status(HttpStatus.OK).build();

@@ -6,11 +6,13 @@ import com.marco.appEscritura.entity.Response;
 import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.exceptions.Document.AlreadyExistingDocument;
 import com.marco.appEscritura.exceptions.Document.NotExistingDocument;
+import com.marco.appEscritura.exceptions.Genre.NotExistingGenre;
 import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
 import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.repository.DocumentRepository;
 import com.marco.appEscritura.repository.UserRepository;
 import com.marco.appEscritura.service.DocumentService;
+import io.jsonwebtoken.MalformedJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -58,7 +60,12 @@ public class DocumentController {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler({NotExistingDocument.class})
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<String> handleMalformedJwtException(MalformedJwtException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token.");
+    }
+
+    @ExceptionHandler({NotExistingDocument.class, NotExistingUser.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> NotExistingExceptionHandler(RuntimeException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
@@ -67,6 +74,12 @@ public class DocumentController {
     @ExceptionHandler({AlreadyExistingDocument.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<String> AlreadyExistingExceptionHandler(RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler({NotExistingGenre.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<String> NotExistingGenreExceptionHandler(RuntimeException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 

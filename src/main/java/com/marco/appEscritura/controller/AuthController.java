@@ -4,10 +4,13 @@ import com.marco.appEscritura.entity.User;
 import com.marco.appEscritura.dto.JwtDto;
 import com.marco.appEscritura.dto.LoginDto;
 import com.marco.appEscritura.dto.RegisterDto;
+import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
 import com.marco.appEscritura.security.token.JwtProvider;
 import com.marco.appEscritura.service.UserService;
+import io.jsonwebtoken.MalformedJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +20,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -39,19 +47,39 @@ public class AuthController {
     @Autowired
     JwtProvider jwtProvider;
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleConstraintViolation(ConstraintViolationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<String> handleMalformedJwtException(MalformedJwtException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token.");
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        List<String> messages = new ArrayList<>();
+        e.getBindingResult().getAllErrors().forEach(err-> messages.add(err.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(messages.stream().collect(Collectors.joining(";")));
+    }
+
+    @ExceptionHandler({AlreadyExistingUser.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<String> AlreadyExistingExceptionHandler(RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
     @Operation(summary = "Registrar usuario", description = "Registra a un usuario en la aplicación")
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterDto newUser){
-
-        if(userService.existsByUsername(newUser.getUsername()))
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
 
         User user = new User(newUser.getUsername(),
                         newUser.getPassword(),newUser.getEmail());
         user.setImage(newUser.getProfileImage());
 
         userService.save(user);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity("Registration was successful",HttpStatus.CREATED);
     }
 
     @Operation(summary = "Iniciar sesión", description = "Inicia la sesión de un usuario en la aplicación")
@@ -68,7 +96,7 @@ public class AuthController {
         return new ResponseEntity(jwtDto, HttpStatus.OK);
 
         } catch (BadCredentialsException e) {
-            return new ResponseEntity<>("Usuario o contraseña incorrectos", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("Invalid password or username", HttpStatus.UNAUTHORIZED);
         }
     }
 

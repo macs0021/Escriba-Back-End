@@ -9,6 +9,7 @@ import com.marco.appEscritura.exceptions.User.AlreadyExistingUser;
 import com.marco.appEscritura.exceptions.User.NotExistingUser;
 import com.marco.appEscritura.repository.ReadingRepository;
 import com.marco.appEscritura.service.ReadingService;
+import io.jsonwebtoken.MalformedJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.websocket.server.PathParam;
 import org.hibernate.exception.ConstraintViolationException;
@@ -34,6 +35,11 @@ public class ReadingController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerRestrictions(ConstraintViolationException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<String> handleMalformedJwtException(MalformedJwtException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token.");
     }
 
     @ExceptionHandler({NotExistingReading.class})
