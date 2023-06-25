@@ -1,10 +1,14 @@
 package com.marco.appEscritura.entity;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.io.Serial;
 import java.io.Serializable;
 
 public class ReadingID implements Serializable {
+    @NotNull
     User reader;
+    @NotNull
     Document beingRead;
 
     public ReadingID() { }

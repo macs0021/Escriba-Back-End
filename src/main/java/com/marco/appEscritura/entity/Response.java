@@ -5,12 +5,14 @@ import com.marco.appEscritura.dto.CommentDTO;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Entity
 @Data
 @DiscriminatorValue("response")
 public class Response extends Comment {
+    @NotNull
     @ManyToOne
     private Review review;
 

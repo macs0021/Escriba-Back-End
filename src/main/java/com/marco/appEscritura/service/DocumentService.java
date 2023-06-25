@@ -60,7 +60,6 @@ public class DocumentService {
             genreService.addDocumentToGenre(genre.getGenre(), savedDocument);
         }
 
-        activityService.createDocumentCreationEvent(user.getUsername(), savedDocument.getId());
         return savedDocument.getId();
 
     }
@@ -236,6 +235,8 @@ public class DocumentService {
         else
             documents = documentRepository.findPublicDocumentsByTittleFragment(tittleFragment);
 
+        documents.sort((document1, document2) -> Double.compare(document2.getRating(), document1.getRating()));
+
         int endIndex = Math.min(offset + pageSize, documents.size());
         return documents.subList(offset, endIndex);
 
@@ -294,7 +295,7 @@ public class DocumentService {
     }
 
     public Optional<Document> findMostLikedPost() {
-        Optional<Document> mostLikedPost = documentRepository.findRandomMostLikedPost();
+        Optional<Document> mostLikedPost = documentRepository.findRandomMostLikedDocument();
         if (mostLikedPost.isPresent()) {
             return mostLikedPost;
         }

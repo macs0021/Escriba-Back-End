@@ -207,6 +207,7 @@ public class DocumentController {
     @GetMapping("/saved/{username}")
     @PreAuthorize("authentication.principal.getUsername() == #username")
     public ResponseEntity<Iterable<DocumentDTO>> getDocumentsSavedBy(@PathVariable String username) {
+        System.out.println("PIDIENDO");
         Iterable<Document> documents = documentService.getDocumentSavedBy(username);
         Collection<Document> documentCollection = new ArrayList<>();
         documents.forEach(documentCollection::add);

@@ -30,8 +30,8 @@ public interface DocumentRepository extends CrudRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE d.isPublic = true AND (d.tittle = '' OR d.tittle LIKE %?1%)")
     List<Document> findPublicDocumentsByTittleFragment(String fragment);
 
-    @Query("SELECT d FROM Document d WHERE d.isPublic = true AND d.rating = (SELECT MAX(d.rating) FROM Document d) ORDER BY RAND() LIMIT 1  ")
-    Optional<Document> findRandomMostLikedPost();
+    @Query("SELECT d FROM Document d WHERE d.isPublic = true AND d.rating = (SELECT MAX(d2.rating) FROM Document d2) ORDER BY RAND() LIMIT 1")
+    Optional<Document> findRandomMostLikedDocument();
 
 
 }

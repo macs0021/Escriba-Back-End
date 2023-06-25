@@ -86,9 +86,15 @@ public class AppEscrituraApplication implements CommandLineRunner {
         }
 
 
-        // Hacer que todos los usuarios se sigan entre ellos
+        Random rand = new Random();
+
         for (User user : users) {
-            for (User otherUser : users) {
+            List<User> others = new ArrayList<>(users);
+            Collections.shuffle(others);
+
+            int followCount = rand.nextInt(userCount) + 1;
+            for (int i = 0; i < followCount; i++) {
+                User otherUser = others.get(i);
                 if (!user.getUsername().equals(otherUser.getUsername())) {
                     userService.updateFollowers(otherUser.getUsername(), user.getUsername());
                 }

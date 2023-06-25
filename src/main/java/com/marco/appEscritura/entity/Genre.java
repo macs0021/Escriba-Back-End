@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Genre implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     long id;
     @NotNull
+    @Column(unique = true)
     String genre;
 
     public Genre(String genre) {

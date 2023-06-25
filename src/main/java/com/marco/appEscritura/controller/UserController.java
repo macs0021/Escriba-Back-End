@@ -70,7 +70,7 @@ public class UserController {
                 .map(user -> user.toDto())
                 .collect(Collectors.toList()));
     }
-    
+
     @Operation(summary = "Obtener recomendaciones para un usuario", description = "Devuelve una lista de recomendaciones para el usuario especificado por su nombre de usuario.")
     @GetMapping("/recommendations/{username}")
     @PreAuthorize("authentication.principal.getUsername() == #username")
